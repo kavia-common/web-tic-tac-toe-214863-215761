@@ -219,3 +219,5 @@ export function useTicTacToe() {
     jumpTo
   };
 }
+
+export default useTicTacToe;

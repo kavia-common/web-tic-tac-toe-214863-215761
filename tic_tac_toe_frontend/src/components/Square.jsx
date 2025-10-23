@@ -43,6 +43,7 @@ function Square({ value, onClick, index, disabled = false }) {
       aria-pressed={false}
       tabIndex={0}
       data-index={index}
+      data-testid={`square-${index}`}
     >
       {value}
     </button>

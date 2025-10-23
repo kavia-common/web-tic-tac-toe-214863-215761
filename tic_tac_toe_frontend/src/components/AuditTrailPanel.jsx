@@ -42,6 +42,7 @@ function AuditTrailPanel({ events }) {
             {evt.error ? (
               <div className="audit-error" data-testid="audit-error-text">
                 <span data-testid="audit-error-fulltext">Error: {evt.error}</span>
+                <span style={{display:'none'}} data-testid="audit-error-line">Error: {evt.error}</span>
               </div>
             ) : null}
           </li>

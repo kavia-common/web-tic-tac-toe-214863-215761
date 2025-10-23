@@ -96,7 +96,7 @@ function RootAppComposition() {
   };
 
   return (
-    <div className="App">
+    <div className="App" data-testid="app-root">
       <header className="App-header">
         <button
           className="theme-toggle"
