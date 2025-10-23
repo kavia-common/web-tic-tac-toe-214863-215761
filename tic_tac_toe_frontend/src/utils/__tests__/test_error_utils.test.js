@@ -1,10 +1,10 @@
 import { makeError, formatError, normalizeErrorCode } from '../error';
 
 describe('error utils', () => {
-  test('makeError sets code and message', () => {
-    const err = makeError('FOO', 'bar');
+  test('makeError sets code and message (normalized)', () => {
+    const err = makeError('validation', 'bar');
     expect(err).toBeInstanceOf(Error);
-    expect(err.code).toBe('FOO');
+    expect(err.code).toBe('VALIDATION_ERROR');
     expect(err.message).toBe('bar');
   });
 

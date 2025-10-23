@@ -49,7 +49,10 @@ function ModalSignature({ open, onConfirm, onCancel }) {
   const handleConfirm = () => {
     const { valid, message } = validateSignature(signature, reason);
     if (!valid) {
-      setError(message || 'Signature or reason invalid.');
+      // Standardize explicit validation messages so tests can assert reliably
+      // Prefer specific messages when provided by validator.
+      const msg = message || (signature ? 'Reason required' : 'Signature required');
+      setError(msg);
       return;
     }
     onConfirm({ signature, reason });
