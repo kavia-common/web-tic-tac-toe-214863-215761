@@ -25,7 +25,7 @@ import React from 'react';
  */
 function AuditTrailPanel({ events }) {
   return (
-    <section className="ttt-audit-panel" aria-label="Audit Trail">
+    <section className="ttt-audit-panel" aria-label="Audit Trail" role="region" data-testid="audit-panel">
       <h2 className="panel-title">Audit Trail</h2>
       <ul className="audit-list">
         {events.map((evt, idx) => (

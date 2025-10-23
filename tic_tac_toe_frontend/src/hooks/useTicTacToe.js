@@ -87,19 +87,21 @@ export function useTicTacToe() {
   const makeMove = useCallback((index) => {
     const before = { ...current, historyLength: history.length, step };
     try {
-      // Default role handling happens via currentUser?.role || 'player' in auditWrap
+      // Permissions first
       if (!hasPermission(currentUser?.role, 'move')) {
         throw makeError('AUTHZ_ERROR', 'User lacks permission to move.');
       }
 
-      // Validation order:
-      // 1) Post-game checks must surface BUSINESS_RULE first
+      // Precedence 1: if game ended, always BUSINESS_RULE: Game already ended.
       validateGameNotEnded(winner, isDraw);
-      // 2) Occupied-square check should throw BUSINESS_RULE before index/range messages
+
+      // Precedence 2: if square is occupied, BUSINESS_RULE should take precedence during active game.
       validateSquareAvailable(current.squares, index);
-      // 3) Index validation as classic VALIDATION_ERROR
+
+      // Then pure validation (index/range)
       validateMoveIndex(index);
-      // 4) Alternation rule as BUSINESS_RULE
+
+      // Alternation rule as BUSINESS_RULE
       validateAlternation(current.nextPlayer, current, step);
 
       const nextSquares = current.squares.slice();
@@ -114,22 +116,20 @@ export function useTicTacToe() {
       setStep(step + 1);
       auditWrap('UPDATE', 'Move', before, { ...next, historyLength: newHistory.length, step: step + 1 }, { reason: 'Make move' });
     } catch (err) {
-      // Normalize error shape: keep plain message in err.message; code in err.code
+      // Normalize error: ensure single prefix and code/message separation
       let e;
       if (err && err.code) {
         e = err;
       } else {
         const msg = String(err && err.message ? err.message : err);
-        // Decide category: validation vs business rule
-        if (/index|range|invalid|out of/i.test(msg)) {
-          e = makeError('VALIDATION_ERROR', msg);
-        } else if (/permission|unauthorized|forbidden/i.test(msg)) {
+        if (/permission|unauthorized|forbidden/i.test(msg)) {
           e = makeError('AUTHZ_ERROR', msg);
+        } else if (/index|range|invalid|out of/i.test(msg)) {
+          e = makeError('VALIDATION_ERROR', msg);
         } else {
           e = makeError('BUSINESS_RULE', msg);
         }
       }
-      // Use a single prefix format for audit strings
       auditWrap('ERROR', 'Move', before, before, { error: formatError(e) });
       // eslint-disable-next-line no-console
       console.error(e);

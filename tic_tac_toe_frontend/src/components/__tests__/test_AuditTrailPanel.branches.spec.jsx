@@ -23,7 +23,7 @@ describe('AuditTrailPanel - branch coverage', () => {
       },
     ];
 
-    render(<AuditTrailPanel events={events} />);
+    const { container } = render(<AuditTrailPanel events={events} />);
 
     // Use container-scoped queries to avoid text fragmentation and ambiguity
     const panel = screen.getByRole('region', { name: /Audit Trail/i });

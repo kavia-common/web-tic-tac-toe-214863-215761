@@ -30,6 +30,7 @@ describe('AuditTrailPanel - single-prefixed error rendering and branches', () =>
     expect(region).toHaveTextContent(/Export audit trail/i);
     expect(region).toHaveTextContent(/Error:\s*BUSINESS_RULE:\s*Selected square is already occupied\./i);
     // Ensure no double prefix present
-    expect(region.textContent.match(/BUSINESS_RULE:/g).length).toBe(1);
+    const matches = region.textContent.match(/BUSINESS_RULE:/g) || [];
+    expect(matches.length).toBe(1);
   });
 });
