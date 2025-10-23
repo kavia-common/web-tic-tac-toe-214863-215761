@@ -29,7 +29,7 @@ describe('useTicTacToe hook', () => {
     expect(result.current.current.nextPlayer).toBe('X');
   });
 
-  test('invalid move index triggers error audit and no state change', () => {
+  test('invalid move index triggers VALIDATION_ERROR audit and no state change', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     const { result } = renderHook(() => {
       const ttt = useTicTacToe();
@@ -41,9 +41,10 @@ describe('useTicTacToe hook', () => {
     act(() => result.current.makeMove(99)); // invalid index
 
     expect(result.current.current.squares).toEqual(before);
-    // Ensure an error audit record appended
+    // Ensure an error audit record appended with VALIDATION_ERROR
     const errorEvt = result.current.events.find(e => e.actionType === 'ERROR' && e.entity === 'Move');
     expect(errorEvt).toBeTruthy();
+    expect(errorEvt.error).toMatch(/VALIDATION_ERROR/);
     expect(typeof errorEvt.timestamp).toBe('string');
     expect(errorEvt.timestamp).toMatch(/T/);
     consoleSpy.mockRestore();
@@ -126,16 +127,24 @@ describe('useTicTacToe hook', () => {
       return { ...ttt, ...audit };
     }, { wrapper: Wrapper });
 
+    // verify default role is player
+    expect(result.current.currentUser?.role || 'player').toBe('player');
+
     // player cannot reset -> error
-    act(() => result.current.resetGame('because', { signature: 'sigA', reason: 'because' }));
+    act(() => {
+      result.current.resetGame('because', { signature: 'sigA', reason: 'because' });
+    });
+    // read events after act to ensure flush
     const errByPlayer = result.current.events.find(e => e.actionType === 'ERROR' && e.entity === 'Reset');
     expect(errByPlayer).toBeTruthy();
     expect(errByPlayer.error).toMatch(/AUTHZ_ERROR/);
 
     // switch to admin and reset
-    act(() => result.current.setCurrentUser({ id: 'user1', role: 'admin' }));
-    act(() => result.current.makeMove(0));
-    act(() => result.current.resetGame('reset for test', { signature: 'sig123', reason: 'reset for test' }));
+    act(() => {
+      result.current.setCurrentUser({ id: 'user1', role: 'admin' });
+      result.current.makeMove(0);
+      result.current.resetGame('reset for test', { signature: 'sig123', reason: 'reset for test' });
+    });
 
     expect(result.current.history.length).toBe(1);
     expect(result.current.current.squares).toEqual(Array(9).fill(null));

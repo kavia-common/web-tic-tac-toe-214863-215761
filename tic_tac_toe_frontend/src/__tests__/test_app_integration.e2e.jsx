@@ -49,7 +49,7 @@ describe('App integration - end-to-end flows', () => {
     const squares = getSquares();
     // try click after draw
     fireEvent.click(squares[8]);
-    expect(squares[8]).toHaveTextContent('O'); // remains final board cell value unchanged
+    expect(squares[8]).toHaveTextContent('X'); // remains final board cell value unchanged (final move by X at index 8)
   });
 
   test('RBAC: player can move but cannot reset or export; auditor cannot move, can export; admin can reset and jump', () => {
