@@ -61,6 +61,7 @@ describe('Standardized error model and validation order alignment', () => {
     const vErr = result.current.events.find(e => e.actionType === 'ERROR' && e.entity === 'Move');
     expect(vErr).toBeTruthy();
     // Single prefixed string via formatError
+    expect(vErr).toBeTruthy();
     expect(vErr.error).toMatch(/^VALIDATION_ERROR:\sMove index must be an integer between 0 and 8\./i);
 
     // Trigger AUTHZ_ERROR by attempting jump as default 'player'

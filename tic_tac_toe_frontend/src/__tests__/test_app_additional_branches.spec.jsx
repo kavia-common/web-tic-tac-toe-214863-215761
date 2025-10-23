@@ -35,8 +35,6 @@ describe('App - additional branches and audit formatting', () => {
     fireEvent.change(role, { target: { value: 'admin' } });
     const exportBtn = screen.getByRole('button', { name: /export/i });
     fireEvent.click(exportBtn);
-    // Expect console logged and no crash; cannot easily retrieve provider events here without deep access,
-    // but invoking path exercises branches at export handler lines.
     expect(spy).toHaveBeenCalled();
     spy.mockRestore();
   });
@@ -50,10 +48,11 @@ describe('App - additional branches and audit formatting', () => {
     // Try occupied move (should log BUSINESS_RULE error)
     fireEvent.click(squares[0]);
 
-    // Open audit panel content should include error line with single prefix and not double-prefixed
+    // Open audit panel content should include error line with single prefix and not double-prefixed.
+    // Use container-level query to avoid text fragmentation.
     const panel = screen.getByRole('region', { name: /Audit Trail/i });
     expect(panel).toBeInTheDocument();
-    const errorItems = within(panel).getAllByText(/^Error: BUSINESS_RULE: Selected square is already occupied\./i);
-    expect(errorItems.length).toBeGreaterThanOrEqual(1);
+    const errorEl = within(panel).getByText(/^Error: BUSINESS_RULE: Selected square is already occupied\./i);
+    expect(errorEl).toBeInTheDocument();
   });
 });
