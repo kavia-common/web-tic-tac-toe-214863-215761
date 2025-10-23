@@ -92,16 +92,21 @@ export function useTicTacToe() {
         throw makeError('AUTHZ_ERROR', 'User lacks permission to move.');
       }
 
-      // Precedence 1: if game ended, always BUSINESS_RULE: Game already ended.
-      validateGameNotEnded(winner, isDraw);
+      // Harmonized precedence:
+      // 1) If game ended -> BUSINESS_RULE 'Game already ended.'
+      if (winner || isDraw) {
+        throw makeError('BUSINESS_RULE', 'Game already ended.');
+      }
 
-      // Precedence 2: if square is occupied, BUSINESS_RULE should take precedence during active game.
-      validateSquareAvailable(current.squares, index);
+      // 2) If square occupied during active game -> BUSINESS_RULE 'Selected square is already occupied.'
+      if (index != null && current.squares?.[index] != null) {
+        throw makeError('BUSINESS_RULE', 'Selected square is already occupied.');
+      }
 
-      // Then pure validation (index/range)
+      // 3) Then validate index/range -> VALIDATION_ERROR via validator
       validateMoveIndex(index);
 
-      // Alternation rule as BUSINESS_RULE
+      // 4) Alternation as BUSINESS_RULE
       validateAlternation(current.nextPlayer, current, step);
 
       const nextSquares = current.squares.slice();
@@ -130,6 +135,7 @@ export function useTicTacToe() {
           e = makeError('BUSINESS_RULE', msg);
         }
       }
+      // Push ERROR audit with structured payload
       auditWrap('ERROR', 'Move', before, before, {
         error: formatError(e),
         errorCode: e.code || 'ERROR',
@@ -165,6 +171,7 @@ export function useTicTacToe() {
           ? makeError('AUTHZ_ERROR', msg)
           : makeError('BUSINESS_RULE', msg);
       }
+      // Push ERROR audit with AUTHZ_ERROR or other code and structured payloads
       auditWrap('ERROR', 'Reset', before, before, {
         error: formatError(e),
         errorCode: e.code || 'ERROR',
@@ -191,6 +198,7 @@ export function useTicTacToe() {
       const msg = String(err && err.message ? err.message : err);
       const isAuth = err && err.code === 'AUTHZ_ERROR';
       const e = isAuth ? err : makeError(/invalid|range|index|out of/i.test(msg) ? 'VALIDATION_ERROR' : 'BUSINESS_RULE', msg);
+      // Push structured ERROR audit payload
       auditWrap('ERROR', 'Jump', before, before, {
         error: formatError(e),
         errorCode: e.code || 'ERROR',

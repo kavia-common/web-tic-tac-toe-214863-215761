@@ -41,7 +41,7 @@ function AuditTrailPanel({ events }) {
             {evt.reason ? <div className="audit-reason">Reason: {evt.reason}</div> : null}
             {evt.error ? (
               <div className="audit-error" data-testid="audit-error-text">
-                Error: {evt.error}
+                <span data-testid="audit-error-fulltext">Error: {evt.error}</span>
               </div>
             ) : null}
           </li>
