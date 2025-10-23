@@ -69,6 +69,7 @@ function ModalSignature({ open, onConfirm, onCancel }) {
       ref={dialogRef}
       data-testid="signature-modal"
     >
+      {/* Testing guidance: queries should use within(dialog) using this container */}
       <div className="modal" data-testid="signature-modal-container">
         <h3 id="signature-title">Electronic Signature Required</h3>
         <p id="signature-desc" className="sr-only">

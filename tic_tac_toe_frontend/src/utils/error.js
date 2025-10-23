@@ -10,7 +10,7 @@
  // Validation Protocol: VP-ERR-001
  // ============================================================================
  */
- 
+
  /**
   * PUBLIC_INTERFACE
   * normalizeErrorCode
@@ -30,7 +30,7 @@
    if (c.includes('AUTHZ') || c.includes('UNAUTHORIZED') || c.includes('FORBIDDEN')) return 'AUTHZ_ERROR';
    return c || 'ERROR';
  }
- 
+
  /**
   * PUBLIC_INTERFACE
   * makeError
@@ -51,7 +51,7 @@
    e.code = normalized;
    return e;
  }
- 
+
  /**
   * PUBLIC_INTERFACE
   * formatError
