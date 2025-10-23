@@ -10,7 +10,7 @@ function Wrapper({ children }) {
 }
 
 describe('Standardized error model and validation order alignment', () => {
-  test('BUSINESS_RULE surfaces for post-game and occupied-square before index validation', () => {
+  test('BUSINESS_RULE surfaces for post-game and occupied-square before index errors', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     const { result } = renderHook(() => {
       const ttt = useTicTacToe();
@@ -48,7 +48,7 @@ describe('Standardized error model and validation order alignment', () => {
     consoleSpy.mockRestore();
   });
 
-  test('Standardized error object: assert err.code categories and plain messages are audited with single prefix', () => {
+  test('Assert single-prefixed audit error strings and category via formatError', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     const { result } = renderHook(() => {
       const ttt = useTicTacToe();
@@ -72,7 +72,7 @@ describe('Standardized error model and validation order alignment', () => {
     consoleSpy.mockRestore();
   });
 
-  test('Provider/wrapper default role is player (unauthorized flows)', () => {
+  test('Provider/wrapper default role is player for unauthorized flows', () => {
     const { result } = renderHook(() => {
       const ttt = useTicTacToe();
       const audit = useAudit();

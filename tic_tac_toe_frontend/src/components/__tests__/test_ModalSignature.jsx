@@ -31,7 +31,8 @@ describe('ModalSignature component', () => {
     // keep queries scoped within active dialog
     const alert = within(dialog).getByTestId('signature-error');
     expect(alert).toBeInTheDocument();
-    expect(alert).toHaveTextContent('Signature required (min 2 chars).');
+    // assert against standardized plain message text per validator
+    expect(alert).toHaveTextContent(/Signature required \(min 2 chars\)\./i);
   });
 
   test('missing reason shows validation error and blocks submit', () => {
@@ -44,7 +45,7 @@ describe('ModalSignature component', () => {
     fireEvent.change(sigInput, { target: { value: 'ok' } });
     fireEvent.click(confirmBtn);
     const alert = within(dialog).getByTestId('signature-error');
-    expect(alert).toHaveTextContent('Reason required (min 3 chars).');
+    expect(alert).toHaveTextContent(/Reason required \(min 3 chars\)\./i);
     expect(onConfirm).not.toHaveBeenCalled();
   });
 

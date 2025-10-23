@@ -9,7 +9,7 @@ describe('Board modal queries and RBAC defaults', () => {
     window.localStorage.clear();
   });
 
-  test('signature modal queries are scoped within the active dialog', () => {
+  test('signature modal queries are strictly scoped within the active dialog', () => {
     render(<App />);
 
     // Switch to admin to enable reset action (opens signature modal)
@@ -48,7 +48,7 @@ describe('Board modal queries and RBAC defaults', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  test('provider defaults currentUser.role to player for unauthorized scenarios', () => {
+  test('provider defaults currentUser.role to player for unauthorized flows', () => {
     render(<App />);
     // As default role player, reset/export buttons are disabled
     const resetBtn = screen.getByRole('button', { name: /Reset game/i });

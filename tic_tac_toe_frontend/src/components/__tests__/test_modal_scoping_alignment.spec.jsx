@@ -7,7 +7,7 @@ describe('Modal scoping alignment', () => {
     window.localStorage.clear();
   });
 
-  test('all modal queries are scoped within the active dialog', () => {
+  test('all modal queries are strictly scoped within the active dialog using within(dialog)', () => {
     render(<App />);
     // elevate to admin to open signature modal
     const roleSelect = screen.getByLabelText(/Role/i);
