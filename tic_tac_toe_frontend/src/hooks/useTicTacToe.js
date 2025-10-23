@@ -92,7 +92,7 @@ export function useTicTacToe() {
         throw makeError('AUTHZ_ERROR', 'User lacks permission to move.');
       }
 
-      // Harmonized precedence:
+      // Harmonized precedence (post-game > occupied > invalid index):
       // 1) If game ended -> BUSINESS_RULE 'Game already ended.'
       if (winner || isDraw) {
         throw makeError('BUSINESS_RULE', 'Game already ended.');

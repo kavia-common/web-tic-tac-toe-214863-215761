@@ -113,7 +113,7 @@ export function normalizeError(input) {
 export function formatError(input) {
   const normalized =
     input && typeof input === 'object' && 'errorCode' in input && 'errorMessage' in input
-      ? /** already structured */ { errorCode: input.errorCode, errorMessage: stripExistingPrefix(input.errorMessage) }
+      ? { errorCode: input.errorCode, errorMessage: stripExistingPrefix(input.errorMessage) }
       : normalizeError(input);
 
   const code = normalized.errorCode || 'UNKNOWN';
