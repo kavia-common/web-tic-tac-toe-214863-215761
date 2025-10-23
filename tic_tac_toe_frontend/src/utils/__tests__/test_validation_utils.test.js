@@ -20,7 +20,7 @@ describe('validateSignature', () => {
 });
 
 describe('move validations', () => {
-  // VALIDATION_ERROR expectation
+  // VALIDATION_ERROR expectation with plain message
   test('validateMoveIndex throws on non-integer or out-of-range', () => {
     expect.assertions(8);
     try { validateMoveIndex(-1); } catch (e) { expect(e.code).toBe('VALIDATION_ERROR'); expect(e.message).toMatch(/integer between 0 and 8/); }
@@ -52,8 +52,8 @@ describe('move validations', () => {
     }
   });
 
-  test('validateGameNotEnded throws when winner or draw present', () => {
-    try { validateGameNotEnded('X', false); } catch (e) { expect(e.code).toBe('BUSINESS_RULE'); expect(e.message).toMatch(/already ended/i); }
-    try { validateGameNotEnded(null, true); } catch (e) { expect(e.code).toBe('BUSINESS_RULE'); expect(e.message).toMatch(/already ended/i); }
+  test('validateGameNotEnded throws when winner or draw present with exact message', () => {
+    try { validateGameNotEnded('X', false); } catch (e) { expect(e.code).toBe('BUSINESS_RULE'); expect(e.message).toBe('Game already ended.'); }
+    try { validateGameNotEnded(null, true); } catch (e) { expect(e.code).toBe('BUSINESS_RULE'); expect(e.message).toBe('Game already ended.'); }
   });
 });

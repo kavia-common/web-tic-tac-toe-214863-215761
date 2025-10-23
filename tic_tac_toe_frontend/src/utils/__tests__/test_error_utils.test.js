@@ -39,4 +39,10 @@ describe('error utils', () => {
     // message should be single-prefixed, not BUSINESS_RULE: BUSINESS_RULE: ...
     expect(msg).toBe('BUSINESS_RULE: Selected square is already occupied.');
   });
+
+  test('formatError strips any duplicate prefixes regardless of differing codes', () => {
+    const e = makeError('VALIDATION_ERROR', 'BUSINESS_RULE: Some failure');
+    // Final prefix should use the error.code (VALIDATION_ERROR), but only once
+    expect(formatError(e)).toBe('VALIDATION_ERROR: Some failure');
+  });
 });
