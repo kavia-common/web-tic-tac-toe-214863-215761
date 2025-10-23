@@ -46,7 +46,7 @@ describe('useTicTacToe hook', () => {
     const errorEvt = result.current.events.find(e => e.actionType === 'ERROR' && e.entity === 'Move');
     expect(errorEvt).toBeTruthy();
     // Error string uses single-prefix "CODE: message"
-    expect(errorEvt.error).toMatch(/^VALIDATION_ERROR:\s/i);
+    expect(errorEvt.error).toMatch(/^VALIDATION_ERROR:\sMove index must be an integer between 0 and 8\./i);
     expect(typeof errorEvt.timestamp).toBe('string');
     expect(errorEvt.timestamp).toMatch(/T/);
     consoleSpy.mockRestore();
@@ -65,8 +65,7 @@ describe('useTicTacToe hook', () => {
 
     const err = result.current.events.find(e => e.actionType === 'ERROR' && e.entity === 'Move');
     expect(err).toBeTruthy();
-    expect(err.error).toMatch(/^BUSINESS_RULE:\s/i);
-    expect(err.error).toMatch(/already occupied/i);
+    expect(err.error).toMatch(/^BUSINESS_RULE:\sSelected square is already occupied\./i);
     consoleSpy.mockRestore();
   });
 
@@ -92,8 +91,7 @@ describe('useTicTacToe hook', () => {
     expect(result.current.current.squares).toEqual(before);
     const err = result.current.events.find(e => e.actionType === 'ERROR' && e.entity === 'Move');
     expect(err).toBeTruthy();
-    expect(err.error).toMatch(/^BUSINESS_RULE:\s/i);
-    expect(err.error).toMatch(/Game already ended/i);
+    expect(err.error).toMatch(/^BUSINESS_RULE:\sGame already ended\./i);
     consoleSpy.mockRestore();
   });
 
@@ -116,8 +114,7 @@ describe('useTicTacToe hook', () => {
     expect(result.current.current.squares).toEqual(before);
     const err = result.current.events.find(e => e.actionType === 'ERROR' && e.entity === 'Move');
     expect(err).toBeTruthy();
-    expect(err.error).toMatch(/^BUSINESS_RULE:\s/i);
-    expect(err.error).toMatch(/Game already ended/i);
+    expect(err.error).toMatch(/^BUSINESS_RULE:\sGame already ended\./i);
     consoleSpy.mockRestore();
   });
 

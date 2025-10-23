@@ -23,7 +23,7 @@ describe('ModalSignature component', () => {
     expect(sigInput).toHaveFocus();
   });
 
-  test('validation error on empty submit shows alert', () => {
+  test('validation error on empty submit shows alert with specific message', () => {
     render(<ModalSignature open={true} onConfirm={jest.fn()} onCancel={jest.fn()} />);
     const dialog = screen.getByRole('dialog', { name: /Electronic Signature Required/i });
     const confirmBtn = within(dialog).getByTestId('confirm-signature');
@@ -31,7 +31,7 @@ describe('ModalSignature component', () => {
     // keep queries scoped within active dialog
     const alert = within(dialog).getByTestId('signature-error');
     expect(alert).toBeInTheDocument();
-    expect(alert).toHaveTextContent(/Signature required/i);
+    expect(alert).toHaveTextContent('Signature required (min 2 chars).');
   });
 
   test('missing reason shows validation error and blocks submit', () => {
@@ -44,7 +44,7 @@ describe('ModalSignature component', () => {
     fireEvent.change(sigInput, { target: { value: 'ok' } });
     fireEvent.click(confirmBtn);
     const alert = within(dialog).getByTestId('signature-error');
-    expect(alert).toHaveTextContent(/Reason required/i);
+    expect(alert).toHaveTextContent('Reason required (min 3 chars).');
     expect(onConfirm).not.toHaveBeenCalled();
   });
 
