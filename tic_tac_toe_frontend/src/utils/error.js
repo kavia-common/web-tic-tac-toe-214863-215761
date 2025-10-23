@@ -44,8 +44,8 @@
  export function makeError(code, message) {
    const normalized = normalizeErrorCode(code);
    const baseMessage = String(message || '');
-   // Prefix code into the thrown Error message to meet tests expecting codes in error strings
-   const e = new Error(baseMessage ? `${normalized}: ${baseMessage}` : `${normalized}:`);
+   // Create Error with plain message; code is carried separately on the object
+   const e = new Error(baseMessage);
    // @ts-ignore
    e.code = normalized;
    return e;
@@ -63,7 +63,15 @@
  export function formatError(err) {
    if (!err) return 'UNKNOWN: Unknown error';
    const code = normalizeErrorCode(err.code || 'ERROR');
-   const rawMessage = err && typeof err.message === 'string' ? err.message : String(err);
-   const message = rawMessage && rawMessage.trim().length ? rawMessage : 'Unknown error';
-   return `${code}: ${message}`;
+   let rawMessage = '';
+   if (err && typeof err.message === 'string') {
+     rawMessage = err.message;
+   } else {
+     rawMessage = String(err);
+   }
+   // If message already includes a leading CODE: prefix, strip it to avoid duplication
+   const prefixMatch = rawMessage.match(/^([A-Z_]+):\s*(.*)$/);
+   const message = prefixMatch ? (prefixMatch[2] || '') : rawMessage;
+   const finalMessage = message && message.trim().length ? message : 'Unknown error';
+   return `${code}: ${finalMessage}`;
  }

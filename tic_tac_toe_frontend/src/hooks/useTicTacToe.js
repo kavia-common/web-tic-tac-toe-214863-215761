@@ -90,12 +90,13 @@ export function useTicTacToe() {
       if (!hasPermission(currentUser?.role, 'move')) {
         throw makeError('AUTHZ_ERROR', 'User lacks permission to move.');
       }
-      // Ensure business-rule validations first so \"game ended\" is prioritized over index issues
+      // Validate index type/range first (pure validation)
+      validateMoveIndex(index);
+      // Then ensure game has not ended and the target is available (business-rule precedence)
       validateGameNotEnded(winner, isDraw);
       validateSquareAvailable(current.squares, index);
+      // Then alternation rule
       validateAlternation(current.nextPlayer, current, step);
-      // Finally, validate index range/type
-      validateMoveIndex(index);
 
       const nextSquares = current.squares.slice();
       nextSquares[index] = current.nextPlayer;
@@ -109,8 +110,18 @@ export function useTicTacToe() {
       setStep(step + 1);
       auditWrap('UPDATE', 'Move', before, { ...next, historyLength: newHistory.length, step: step + 1 }, { reason: 'Make move' });
     } catch (err) {
-      // Normalize unknown errors thrown by validators to expected code categories
-      const e = err && err.code ? err : (err && /index|range|invalid|out of/i.test(String(err.message || err)) ? makeError('VALIDATION_ERROR', String(err.message || err)) : makeError('BUSINESS_RULE', String(err.message || err)));
+      // Map unknown errors into expected categories with plain messages
+      let e;
+      if (err && err.code) {
+        e = err;
+      } else {
+        const msg = String(err && err.message ? err.message : err);
+        if (/index|range|invalid|out of/i.test(msg)) {
+          e = makeError('VALIDATION_ERROR', msg);
+        } else {
+          e = makeError('BUSINESS_RULE', msg);
+        }
+      }
       auditWrap('ERROR', 'Move', before, before, { error: formatError(e) });
       // eslint-disable-next-line no-console
       console.error(e);

@@ -22,6 +22,7 @@ import { makeError } from './error';
  */
 export function validateMoveIndex(index) {
   if (typeof index !== 'number' || !Number.isInteger(index) || index < 0 || index > 8) {
+    // Index validation is a classic validation error
     throw makeError('VALIDATION_ERROR', 'Move index must be an integer between 0 and 8.');
   }
 }
@@ -36,6 +37,7 @@ export function validateMoveIndex(index) {
  */
 export function validateSquareAvailable(squares, index) {
   if (squares[index]) {
+    // Occupied square is a business rule violation
     throw makeError('BUSINESS_RULE', 'Selected square is already occupied.');
   }
 }
@@ -54,6 +56,7 @@ export function validateAlternation(expectedPlayer, current, step) {
   const oCount = current.squares.filter((v) => v === 'O').length;
   const shouldBe = xCount === oCount ? 'X' : 'O';
   if (expectedPlayer !== shouldBe || expectedPlayer !== (step % 2 === 0 ? 'X' : 'O')) {
+    // Alternation is a business rule
     throw makeError('BUSINESS_RULE', 'Turn alternation rule violated.');
   }
 }
@@ -68,6 +71,7 @@ export function validateAlternation(expectedPlayer, current, step) {
  */
 export function validateGameNotEnded(winner, isDraw) {
   if (winner || isDraw) {
+    // Attempting play after end is a business rule violation
     throw makeError('BUSINESS_RULE', 'Game already ended.');
   }
 }
