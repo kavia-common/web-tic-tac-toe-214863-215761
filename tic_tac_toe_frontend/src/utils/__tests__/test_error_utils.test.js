@@ -40,6 +40,12 @@ describe('error utils', () => {
     expect(msg).toBe('BUSINESS_RULE: Selected square is already occupied.');
   });
 
+  test('formatError preserves plain message while normalizing code', () => {
+    const e = makeError('validation_error', 'VALIDATION_ERROR: Move index must be an integer between 0 and 8.');
+    // Should keep only one prefix and keep the plain message after stripping the duplicate
+    expect(formatError(e)).toBe('VALIDATION_ERROR: Move index must be an integer between 0 and 8.');
+  });
+
   test('formatError strips any duplicate prefixes regardless of differing codes', () => {
     const e = makeError('VALIDATION_ERROR', 'BUSINESS_RULE: Some failure');
     // Final prefix should use the error.code (VALIDATION_ERROR), but only once

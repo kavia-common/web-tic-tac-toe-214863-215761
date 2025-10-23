@@ -141,9 +141,11 @@ describe('App integration - end-to-end flows', () => {
     const reasonInput = within(dialog).getByTestId('reason-input');
     const confirmBtn = within(dialog).getByTestId('confirm-signature');
 
+    // First click: expect validation error inside the same dialog
     fireEvent.click(confirmBtn);
     expect(within(dialog).getByTestId('signature-error')).toBeInTheDocument();
 
+    // Provide valid inputs and confirm again
     fireEvent.change(sigInput, { target: { value: 'sig999' } });
     fireEvent.change(reasonInput, { target: { value: 'reset ok' } });
     fireEvent.click(confirmBtn);
