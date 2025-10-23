@@ -21,25 +21,36 @@ describe('validateSignature', () => {
 
 describe('move validations', () => {
   test('validateMoveIndex throws on non-integer or out-of-range', () => {
-    expect(() => validateMoveIndex(-1)).toThrow(/VALIDATION_ERROR/);
-    expect(() => validateMoveIndex(9)).toThrow(/VALIDATION_ERROR/);
-    expect(() => validateMoveIndex(1.5)).toThrow(/VALIDATION_ERROR/);
-    expect(() => validateMoveIndex('2')).toThrow(/VALIDATION_ERROR/); // type error standardized
+    expect.assertions(8);
+    try { validateMoveIndex(-1); } catch (e) { expect(e.code).toBe('VALIDATION_ERROR'); expect(e.message).toMatch(/integer between 0 and 8/); }
+    try { validateMoveIndex(9); } catch (e) { expect(e.code).toBe('VALIDATION_ERROR'); expect(e.message).toMatch(/integer between 0 and 8/); }
+    try { validateMoveIndex(1.5); } catch (e) { expect(e.code).toBe('VALIDATION_ERROR'); expect(e.message).toMatch(/integer between 0 and 8/); }
+    try { /* @ts-ignore */ validateMoveIndex('2'); } catch (e) { expect(e.code).toBe('VALIDATION_ERROR'); expect(e.message).toMatch(/integer between 0 and 8/); }
   });
 
   test('validateSquareAvailable throws when occupied', () => {
     const squares = Array(9).fill(null);
     squares[0] = 'X';
-    expect(() => validateSquareAvailable(squares, 0)).toThrow(/BUSINESS_RULE/);
+    try {
+      validateSquareAvailable(squares, 0);
+    } catch (e) {
+      expect(e.code).toBe('BUSINESS_RULE');
+      expect(e.message).toMatch(/already occupied/);
+    }
   });
 
   test('validateAlternation throws when rule violated', () => {
     const current = { squares: ['X', null, null, null, null, null, null, null, null] }; // X count 1, O 0 -> expected O
-    expect(() => validateAlternation('X', current, 1)).toThrow(/BUSINESS_RULE/);
+    try {
+      validateAlternation('X', current, 1);
+    } catch (e) {
+      expect(e.code).toBe('BUSINESS_RULE');
+      expect(e.message).toMatch(/alternation/i);
+    }
   });
 
   test('validateGameNotEnded throws when winner or draw present', () => {
-    expect(() => validateGameNotEnded('X', false)).toThrow(/BUSINESS_RULE/);
-    expect(() => validateGameNotEnded(null, true)).toThrow(/BUSINESS_RULE/);
+    try { validateGameNotEnded('X', false); } catch (e) { expect(e.code).toBe('BUSINESS_RULE'); expect(e.message).toMatch(/already ended/i); }
+    try { validateGameNotEnded(null, true); } catch (e) { expect(e.code).toBe('BUSINESS_RULE'); expect(e.message).toMatch(/already ended/i); }
   });
 });
