@@ -151,7 +151,16 @@ export function useTicTacToe() {
         signatureMeta
       });
     } catch (err) {
-      const e = err && err.code ? err : makeError('BUSINESS_RULE', String(err.message || err));
+      // Ensure unauthorized reset produces AUTHZ_ERROR; otherwise default business rule
+      let e;
+      if (err && err.code) {
+        e = err;
+      } else {
+        const msg = String(err && err.message ? err.message : err);
+        e = /permission|unauthorized|forbidden/i.test(msg)
+          ? makeError('AUTHZ_ERROR', msg)
+          : makeError('BUSINESS_RULE', msg);
+      }
       auditWrap('ERROR', 'Reset', before, before, { error: formatError(e) });
       // eslint-disable-next-line no-console
       console.error(e);

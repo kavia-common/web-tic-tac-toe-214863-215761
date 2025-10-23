@@ -63,7 +63,10 @@ export function makeError(code, message) {
  * @returns {string}
  */
 export function formatError(err) {
-  if (!err) return 'ERROR: Unknown error';
+  // For null/undefined explicitly return UNKNOWN prefix per spec
+  if (err === null || typeof err === 'undefined') {
+    return 'UNKNOWN: Unknown error';
+  }
   const code = normalizeErrorCode(err.code || 'ERROR');
 
   // Determine a raw message string
