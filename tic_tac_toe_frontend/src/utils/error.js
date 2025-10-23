@@ -65,15 +65,26 @@ export function makeError(code, message) {
 export function formatError(err) {
   if (!err) return 'ERROR: Unknown error';
   const code = normalizeErrorCode(err.code || 'ERROR');
+
+  // Determine a raw message string
   let rawMessage = '';
   if (err && typeof err.message === 'string') {
     rawMessage = err.message;
+  } else if (typeof err === 'string') {
+    rawMessage = err;
   } else {
-    rawMessage = String(err);
+    try {
+      rawMessage = JSON.stringify(err);
+    } catch {
+      rawMessage = String(err);
+    }
   }
-  // Strip any pre-existing CODE: prefix from message to avoid double prefixing
-  const prefixMatch = rawMessage.match(/^([A-Z_]+):\s*(.*)$/);
+
+  // Strip any pre-existing CODE: prefix from the message to avoid double prefixing
+  const prefixMatch = String(rawMessage).match(/^([A-Z_]+):\s*(.*)$/);
   const message = prefixMatch ? (prefixMatch[2] || '') : rawMessage;
+
+  // Ensure we only surface a plain message and not include error code in the message
   const finalMessage = message && message.trim().length ? message.trim() : 'Unknown error';
   return `${code}: ${finalMessage}`;
 }

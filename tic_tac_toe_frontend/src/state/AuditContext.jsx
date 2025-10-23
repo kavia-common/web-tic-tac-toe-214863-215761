@@ -48,7 +48,7 @@ export function AuditTrailProvider({ children }) {
       const parsed = raw ? JSON.parse(raw) : null;
       // Default provider/wrapper role is 'player' for unauthorized flows.
       // This ensures RBAC tests see player by default without explicit setup.
-      if (!parsed) return { id: 'user1', role: 'player' };
+      if (!parsed || typeof parsed !== 'object') return { id: 'user1', role: 'player' };
       return { id: parsed.id || 'user1', role: parsed.role || 'player' };
     } catch {
       return { id: 'user1', role: 'player' };

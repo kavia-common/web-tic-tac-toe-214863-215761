@@ -120,9 +120,14 @@ export function useTicTacToe() {
         e = err;
       } else {
         const msg = String(err && err.message ? err.message : err);
-        e = /index|range|invalid|out of/i.test(msg)
-          ? makeError('VALIDATION_ERROR', msg)
-          : makeError('BUSINESS_RULE', msg);
+        // Decide category: validation vs business rule
+        if (/index|range|invalid|out of/i.test(msg)) {
+          e = makeError('VALIDATION_ERROR', msg);
+        } else if (/permission|unauthorized|forbidden/i.test(msg)) {
+          e = makeError('AUTHZ_ERROR', msg);
+        } else {
+          e = makeError('BUSINESS_RULE', msg);
+        }
       }
       // Use a single prefix format for audit strings
       auditWrap('ERROR', 'Move', before, before, { error: formatError(e) });

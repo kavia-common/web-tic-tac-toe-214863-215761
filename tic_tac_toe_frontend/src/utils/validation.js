@@ -73,6 +73,7 @@ export function validateGameNotEnded(winner, isDraw) {
   if (winner || isDraw) {
     // Attempting play after end is a business rule violation
     // Must specifically message 'Game already ended.' for test expectations
+    // Keep error.message plain without code tag; code is on .code field
     throw makeError('BUSINESS_RULE', 'Game already ended.');
   }
 }
