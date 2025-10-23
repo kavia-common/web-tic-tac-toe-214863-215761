@@ -209,6 +209,10 @@ export function useTicTacToe() {
     }
   }, [history, step, auditWrap, currentUser]);
 
+  // Backward/forward compatible alias exports so tests can call handleMove()
+  const handleMove = makeMove;
+  const reset = resetGame;
+
   return {
     history,
     current,
@@ -216,7 +220,10 @@ export function useTicTacToe() {
     isDraw,
     makeMove,
     resetGame,
-    jumpTo
+    jumpTo,
+    // additional aliases used by legacy/new tests
+    handleMove,
+    reset
   };
 }
 

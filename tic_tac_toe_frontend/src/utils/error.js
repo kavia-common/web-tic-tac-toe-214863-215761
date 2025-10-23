@@ -56,24 +56,32 @@ export function makeError(code, message) {
  * PUBLIC_INTERFACE
  * formatError
  * This is a public function.
- * Formats error to readable string "CODE: message".
- * Ensures code normalization consistent with makeError for thrown non-standard errors.
- * Enforces single prefix and plain message content.
+ * Formats error into a single-prefixed string with exact prefixes:
+ *  - 'BUSINESS_RULE: ...'
+ *  - 'VALIDATION_ERROR: ...'
+ *  - 'AUTHZ_ERROR: ...'
+ *  - 'UNKNOWN: Unknown error' for null/undefined
+ * For plain string inputs, returns 'UNKNOWN: <message-without-existing-prefix>'.
  * @param {any} err
  * @returns {string}
  */
 export function formatError(err) {
-  // For null/undefined explicitly return UNKNOWN prefix per spec
+  // Explicit handling for null/undefined
   if (err === null || typeof err === 'undefined') {
     return 'UNKNOWN: Unknown error';
   }
-  // If provided a plain string (not an Error object), treat it as an unknown error message with UNKNOWN code
+
+  // For plain string inputs, treat as UNKNOWN and strip any existing prefix to avoid double prefixing
   if (typeof err === 'string') {
     const stripped = err.replace(/^([A-Z_]+):\s*/,'').trim() || 'Unknown error';
     return `UNKNOWN: ${stripped}`;
   }
 
-  const code = normalizeErrorCode(err?.code || 'ERROR');
+  // Normalize code strictly to the three known categories; otherwise fall back to ERROR
+  const normalized = normalizeErrorCode(err?.code || '');
+  const code = ['BUSINESS_RULE', 'VALIDATION_ERROR', 'AUTHZ_ERROR'].includes(normalized)
+    ? normalized
+    : (normalized || 'ERROR');
 
   // Determine a raw message string
   let rawMessage = '';
@@ -91,7 +99,6 @@ export function formatError(err) {
   const prefixMatch = String(rawMessage).match(/^([A-Z_]+):\s*(.*)$/);
   const message = prefixMatch ? (prefixMatch[2] || '') : rawMessage;
 
-  // Ensure we only surface a plain message and not include error code in the message
   const finalMessage = message && message.trim().length ? message.trim() : 'Unknown error';
   return `${code}: ${finalMessage}`;
 }
