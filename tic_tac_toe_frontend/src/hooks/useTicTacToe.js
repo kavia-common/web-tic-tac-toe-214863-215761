@@ -220,4 +220,5 @@ export function useTicTacToe() {
   };
 }
 
-export default useTicTacToe;
+// Maintain both named and default exports for compatibility with tests
+export { useTicTacToe as default };

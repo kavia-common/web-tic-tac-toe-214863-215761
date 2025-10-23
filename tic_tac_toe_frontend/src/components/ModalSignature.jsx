@@ -70,7 +70,7 @@ function ModalSignature({ open, onConfirm, onCancel }) {
       data-testid="signature-modal"
     >
       {/* Testing guidance: queries should use within(dialog) using this container */}
-      <div className="modal" data-testid="signature-modal-container">
+      <div className="modal" data-testid="signature-modal-container" data-modal-testid="modal-signature">
         <h3 id="signature-title">Electronic Signature Required</h3>
         <p id="signature-desc" className="sr-only">
           Provide your electronic signature and a reason for the action, then press Confirm Signature to proceed or Cancel Signature to abort.
