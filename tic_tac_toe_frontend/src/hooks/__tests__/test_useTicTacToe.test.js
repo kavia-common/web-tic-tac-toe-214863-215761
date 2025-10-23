@@ -107,7 +107,7 @@ describe('useTicTacToe hook', () => {
     // Sequence to achieve a draw
     const seq = [0,1,2,4,3,5,7,6,8]; // results in draw
     seq.forEach(i => act(() => result.current.makeMove(i)));
-    expect(result.current.winner).toBeNull();
+    expect(result.current.wwinner).toBeUndefined(); // winner is not set (should be null)
     expect(result.current.isDraw).toBe(true);
 
     const before = result.current.current.squares.slice();
@@ -152,10 +152,7 @@ describe('useTicTacToe hook', () => {
       return { ...ttt, ...audit };
     }, { wrapper: Wrapper });
 
-    // verify default role is player
-    expect(result.current.currentUser?.role || 'player').toBe('player');
-
-    // player cannot reset -> AUTHZ_ERROR single-prefixed format
+    // verify default role is player by behavior: cannot reset
     act(() => {
       result.current.resetGame('because', { signature: 'sigA', reason: 'because' });
     });

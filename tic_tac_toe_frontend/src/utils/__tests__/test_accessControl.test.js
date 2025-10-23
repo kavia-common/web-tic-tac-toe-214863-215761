@@ -17,5 +17,15 @@ describe('RBAC utilities', () => {
     expect(permissionsForRole('auditor')).toEqual({
       canMove: false, canReset: false, canJump: false, canExport: true
     });
+    expect(permissionsForRole('admin')).toEqual({
+      canMove: true, canReset: true, canJump: true, canExport: true
+    });
+  });
+
+  test('undefined role (unauthorized) defaults to player permissions', () => {
+    expect(permissionsForRole(undefined)).toEqual({
+      canMove: true, canReset: false, canJump: false, canExport: false
+    });
+    expect(hasPermission(undefined, 'move')).toBe(true);
   });
 });
