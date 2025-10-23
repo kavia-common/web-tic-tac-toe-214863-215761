@@ -83,6 +83,7 @@ function ModalSignature({ open, onConfirm, onCancel }) {
             value={signature}
             onChange={(e) => setSignature(e.target.value)}
             aria-required="true"
+            aria-label="Signature input"
             placeholder="Enter your signature"
             name="signature"
             autoComplete="current-password"
@@ -97,6 +98,7 @@ function ModalSignature({ open, onConfirm, onCancel }) {
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             aria-required="true"
+            aria-label="Reason input"
             placeholder="Describe why this change is necessary"
             name="reason"
             autoComplete="off"
@@ -104,7 +106,7 @@ function ModalSignature({ open, onConfirm, onCancel }) {
           />
         </div>
         {error ? (
-          <div className="error-text" role="alert" aria-live="assertive">
+          <div className="error-text" role="alert" aria-live="assertive" data-testid="signature-error">
             {error}
           </div>
         ) : null}

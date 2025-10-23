@@ -66,7 +66,7 @@ test('reset requires signature via modal and then clears board', () => {
 
   // Try confirm with empty to see validation error
   fireEvent.click(confirmBtn);
-  expect(within(dialog).getByRole('alert')).toBeInTheDocument();
+  expect(within(dialog).getByTestId('signature-error')).toBeInTheDocument();
 
   // Provide valid inputs and confirm
   fireEvent.change(sigInput, { target: { value: 'sig999' } });

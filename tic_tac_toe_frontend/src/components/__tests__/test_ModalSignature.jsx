@@ -29,7 +29,7 @@ describe('ModalSignature component', () => {
     const confirmBtn = within(dialog).getByRole('button', { name: /Confirm Signature/i });
     fireEvent.click(confirmBtn);
     // scope alert lookup within the dialog to avoid cross-modal interference
-    const alert = within(dialog).getByRole('alert');
+    const alert = within(dialog).getByTestId('signature-error');
     expect(alert).toBeInTheDocument();
     expect(alert).toHaveTextContent(/Signature required/i);
   });

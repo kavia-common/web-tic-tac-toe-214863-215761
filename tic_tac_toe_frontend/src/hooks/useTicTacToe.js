@@ -107,10 +107,11 @@ export function useTicTacToe() {
       setStep(step + 1);
       auditWrap('UPDATE', 'Move', before, { ...next, historyLength: newHistory.length, step: step + 1 }, { reason: 'Make move' });
     } catch (err) {
-      auditWrap('ERROR', 'Move', before, before, { error: formatError(err) });
-      // Rethrow to allow UI messaging if needed
+      // Normalize unknown errors thrown by validators to expected code categories
+      const e = err && err.code ? err : (err && /index|range|invalid|out of/i.test(String(err.message || err)) ? makeError('VALIDATION_ERROR', String(err.message || err)) : makeError('BUSINESS_RULE', String(err.message || err)));
+      auditWrap('ERROR', 'Move', before, before, { error: formatError(e) });
       // eslint-disable-next-line no-console
-      console.error(err);
+      console.error(e);
     }
   }, [current, step, history, auditWrap, winner, isDraw, currentUser]);
 
@@ -129,9 +130,10 @@ export function useTicTacToe() {
         signatureMeta
       });
     } catch (err) {
-      auditWrap('ERROR', 'Reset', before, before, { error: formatError(err) });
+      const e = err && err.code ? err : makeError('BUSINESS_RULE', String(err.message || err));
+      auditWrap('ERROR', 'Reset', before, before, { error: formatError(e) });
       // eslint-disable-next-line no-console
-      console.error(err);
+      console.error(e);
     }
   }, [history, step, auditWrap, currentUser]);
 
@@ -148,9 +150,12 @@ export function useTicTacToe() {
       setStep(moveIndex);
       auditWrap('READ', 'Jump', before, { step: moveIndex }, { reason: `Jump to ${moveIndex}` });
     } catch (err) {
-      auditWrap('ERROR', 'Jump', before, before, { error: formatError(err) });
+      const msg = String(err && err.message ? err.message : err);
+      const isAuth = err && err.code === 'AUTHZ_ERROR';
+      const e = isAuth ? err : makeError(/invalid|range|index|out of/i.test(msg) ? 'VALIDATION_ERROR' : 'BUSINESS_RULE', msg);
+      auditWrap('ERROR', 'Jump', before, before, { error: formatError(e) });
       // eslint-disable-next-line no-console
-      console.error(err);
+      console.error(e);
     }
   }, [history, step, auditWrap, currentUser]);
 

@@ -61,6 +61,7 @@
  export function formatError(err) {
    if (!err) return 'UNKNOWN: Unknown error';
    const code = normalizeErrorCode(err.code || 'ERROR');
-   const message = err.message || String(err);
+   const rawMessage = err && typeof err.message === 'string' ? err.message : String(err);
+   const message = rawMessage && rawMessage.trim().length ? rawMessage : 'Unknown error';
    return `${code}: ${message}`;
  }

@@ -142,7 +142,7 @@ describe('App integration - end-to-end flows', () => {
     const confirmBtn = within(dialog).getByRole('button', { name: /Confirm signature/i });
 
     fireEvent.click(confirmBtn);
-    expect(within(dialog).getByRole('alert')).toBeInTheDocument();
+    expect(within(dialog).getByTestId('signature-error')).toBeInTheDocument();
 
     fireEvent.change(sigInput, { target: { value: 'sig999' } });
     fireEvent.change(reasonInput, { target: { value: 'reset ok' } });
