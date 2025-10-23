@@ -3,7 +3,7 @@ import React from 'react';
 import { useTicTacToe } from '../useTicTacToe';
 import { AuditTrailProvider, useAudit } from '../../state/AuditContext';
 
-// Helper provider to wrap hook with context
+// Helper provider to wrap hook with context, default role player for unauthorized scenarios
 function Wrapper({ children }) {
   return <AuditTrailProvider>{children}</AuditTrailProvider>;
 }
@@ -67,9 +67,13 @@ describe('useTicTacToe hook', () => {
     consoleSpy.mockRestore();
   });
 
-  test('winner detection (X wins top row), disables further moves', () => {
+  test('winner detection (X wins top row) disables further moves', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    const { result } = renderHook(() => useTicTacToe(), { wrapper: Wrapper });
+    const { result } = renderHook(() => {
+      const ttt = useTicTacToe();
+      const audit = useAudit();
+      return { ...ttt, ...audit };
+    }, { wrapper: Wrapper });
 
     act(() => result.current.makeMove(0)); // X
     act(() => result.current.makeMove(3)); // O
@@ -80,19 +84,35 @@ describe('useTicTacToe hook', () => {
     expect(result.current.winner).toBe('X');
 
     // attempt further move should generate error audit (game ended)
+    const before = result.current.current.squares.slice();
     act(() => result.current.makeMove(5));
-    // No change on board 5
-    expect(result.current.current.squares[5]).toBeNull();
+    expect(result.current.current.squares).toEqual(before);
+    const err = result.current.events.find(e => e.actionType === 'ERROR' && e.entity === 'Move');
+    expect(err).toBeTruthy();
+    expect(err.error).toMatch(/Game already ended/);
     consoleSpy.mockRestore();
   });
 
-  test('draw detection when board filled without winner', () => {
-    const { result } = renderHook(() => useTicTacToe(), { wrapper: Wrapper });
+  test('draw detection when board filled without winner blocks further moves', () => {
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const { result } = renderHook(() => {
+      const ttt = useTicTacToe();
+      const audit = useAudit();
+      return { ...ttt, ...audit };
+    }, { wrapper: Wrapper });
     // Sequence to achieve a draw
     const seq = [0,1,2,4,3,5,7,6,8]; // results in draw
     seq.forEach(i => act(() => result.current.makeMove(i)));
     expect(result.current.winner).toBeNull();
     expect(result.current.isDraw).toBe(true);
+
+    const before = result.current.current.squares.slice();
+    act(() => result.current.makeMove(6)); // any additional
+    expect(result.current.current.squares).toEqual(before);
+    const err = result.current.events.find(e => e.actionType === 'ERROR' && e.entity === 'Move');
+    expect(err).toBeTruthy();
+    expect(err.error).toMatch(/Game already ended/);
+    consoleSpy.mockRestore();
   });
 
   test('jumpTo with authorization: admin can jump, player cannot', () => {

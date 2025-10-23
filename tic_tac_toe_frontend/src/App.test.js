@@ -1,9 +1,14 @@
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { render, screen, fireEvent, within, cleanup } from '@testing-library/react';
 import App from './App';
 
 function makeMoves(squares, indices) {
   indices.forEach((i) => fireEvent.click(squares[i]));
 }
+
+afterEach(() => {
+  // ensure cleanup so only one modal instance exists across tests
+  cleanup();
+});
 
 test('renders status bar and board', () => {
   render(<App />);
@@ -61,7 +66,7 @@ test('reset requires signature via modal and then clears board', () => {
 
   // Try confirm with empty to see validation error
   fireEvent.click(confirmBtn);
-  expect(within(dialog).getByRole('alert')).toHaveTextContent(/Signature required|Reason required/);
+  expect(within(dialog).getByRole('alert')).toBeInTheDocument();
 
   // Provide valid inputs and confirm
   fireEvent.change(sigInput, { target: { value: 'sig999' } });
@@ -69,7 +74,7 @@ test('reset requires signature via modal and then clears board', () => {
   fireEvent.click(confirmBtn);
 
   // Modal closed and board reset
-  expect(screen.queryByText(/Electronic Signature Required/i)).not.toBeInTheDocument();
+  expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   expect(squares[0]).toHaveTextContent('');
 });
 
