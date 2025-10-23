@@ -17,7 +17,7 @@ describe('ModalSignature component', () => {
     render(<ModalSignature open={true} onConfirm={jest.fn()} onCancel={jest.fn()} />);
     const dialog = screen.getByRole('dialog', { name: /Electronic Signature Required/i });
     expect(dialog).toBeInTheDocument();
-    // Scope queries within the active dialog to avoid cross-modal collisions
+    // Queries are intentionally scoped to the active dialog to avoid ambiguity
     const sigInput = within(dialog).getByTestId('signature-input');
     sigInput.focus();
     expect(sigInput).toHaveFocus();

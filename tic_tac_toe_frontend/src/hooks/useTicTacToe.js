@@ -90,10 +90,12 @@ export function useTicTacToe() {
       if (!hasPermission(currentUser?.role, 'move')) {
         throw makeError('AUTHZ_ERROR', 'User lacks permission to move.');
       }
-      validateMoveIndex(index);
+      // Ensure business-rule validations first so \"game ended\" is prioritized over index issues
       validateGameNotEnded(winner, isDraw);
       validateSquareAvailable(current.squares, index);
       validateAlternation(current.nextPlayer, current, step);
+      // Finally, validate index range/type
+      validateMoveIndex(index);
 
       const nextSquares = current.squares.slice();
       nextSquares[index] = current.nextPlayer;

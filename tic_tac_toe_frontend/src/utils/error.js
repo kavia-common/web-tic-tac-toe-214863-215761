@@ -43,7 +43,9 @@
   */
  export function makeError(code, message) {
    const normalized = normalizeErrorCode(code);
-   const e = new Error(String(message || ''));
+   const baseMessage = String(message || '');
+   // Prefix code into the thrown Error message to meet tests expecting codes in error strings
+   const e = new Error(baseMessage ? `${normalized}: ${baseMessage}` : `${normalized}:`);
    // @ts-ignore
    e.code = normalized;
    return e;
