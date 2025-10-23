@@ -28,6 +28,7 @@ describe('ModalSignature component', () => {
     const dialog = screen.getByRole('dialog', { name: /Electronic Signature Required/i });
     const confirmBtn = within(dialog).getByRole('button', { name: /Confirm signature/i });
     fireEvent.click(confirmBtn);
+    // scope alert lookup within the dialog to avoid cross-modal interference
     expect(within(dialog).getByRole('alert')).toBeInTheDocument();
   });
 

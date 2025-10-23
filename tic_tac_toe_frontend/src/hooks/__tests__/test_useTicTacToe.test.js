@@ -44,6 +44,7 @@ describe('useTicTacToe hook', () => {
     // Ensure an error audit record appended with VALIDATION_ERROR
     const errorEvt = result.current.events.find(e => e.actionType === 'ERROR' && e.entity === 'Move');
     expect(errorEvt).toBeTruthy();
+    // Error code should be VALIDATION_ERROR for invalid index
     expect(errorEvt.error).toMatch(/VALIDATION_ERROR/);
     expect(typeof errorEvt.timestamp).toBe('string');
     expect(errorEvt.timestamp).toMatch(/T/);
