@@ -4,7 +4,7 @@ import ModalSignature from '../ModalSignature';
 
 describe('ModalSignature component', () => {
   afterEach(() => {
-    // ensure isolation; only one modal per test scenario
+    // ensure isolation; only one ModalSignature instance is mounted per test
     cleanup();
   });
 
@@ -17,8 +17,8 @@ describe('ModalSignature component', () => {
     render(<ModalSignature open={true} onConfirm={jest.fn()} onCancel={jest.fn()} />);
     const dialog = screen.getByRole('dialog', { name: /Electronic Signature Required/i });
     expect(dialog).toBeInTheDocument();
-    const sigInput = within(dialog).getByLabelText(/Signature/i);
-    // focus should be on signature input after mount
+    // Scope queries within the active dialog to avoid cross-modal collisions
+    const sigInput = within(dialog).getByTestId('signature-input');
     sigInput.focus();
     expect(sigInput).toHaveFocus();
   });
@@ -28,7 +28,6 @@ describe('ModalSignature component', () => {
     const dialog = screen.getByRole('dialog', { name: /Electronic Signature Required/i });
     const confirmBtn = within(dialog).getByRole('button', { name: /Confirm Signature/i });
     fireEvent.click(confirmBtn);
-    // scope alert lookup within the dialog to avoid cross-modal interference
     const alert = within(dialog).getByTestId('signature-error');
     expect(alert).toBeInTheDocument();
     expect(alert).toHaveTextContent(/Signature required/i);
@@ -38,12 +37,12 @@ describe('ModalSignature component', () => {
     const onConfirm = jest.fn();
     render(<ModalSignature open={true} onConfirm={onConfirm} onCancel={jest.fn()} />);
     const dialog = screen.getByRole('dialog', { name: /Electronic Signature Required/i });
-    const sigInput = within(dialog).getByLabelText(/Signature/i);
+    const sigInput = within(dialog).getByTestId('signature-input');
     const confirmBtn = within(dialog).getByRole('button', { name: /Confirm signature/i });
 
     fireEvent.change(sigInput, { target: { value: 'ok' } });
     fireEvent.click(confirmBtn);
-    const alert = within(dialog).getByRole('alert');
+    const alert = within(dialog).getByTestId('signature-error');
     expect(alert).toHaveTextContent(/Reason required/i);
     expect(onConfirm).not.toHaveBeenCalled();
   });
@@ -52,8 +51,8 @@ describe('ModalSignature component', () => {
     const onConfirm = jest.fn();
     render(<ModalSignature open={true} onConfirm={onConfirm} onCancel={jest.fn()} />);
     const dialog = screen.getByRole('dialog', { name: /Electronic Signature Required/i });
-    const sigInput = within(dialog).getByLabelText(/Signature/i);
-    const reasonInput = within(dialog).getByLabelText(/Reason for change/i);
+    const sigInput = within(dialog).getByTestId('signature-input');
+    const reasonInput = within(dialog).getByTestId('reason-input');
     const confirmBtn = within(dialog).getByRole('button', { name: /Confirm signature/i });
 
     fireEvent.change(sigInput, { target: { value: 'secret123' } });

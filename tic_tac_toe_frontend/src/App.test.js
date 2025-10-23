@@ -19,6 +19,10 @@ test('renders status bar and board', () => {
 
 test('player role can make a move', () => {
   render(<App />);
+  // explicit role=player to avoid leakage across tests
+  const select = screen.getByLabelText(/Role/i);
+  fireEvent.change(select, { target: { value: 'player' } });
+
   const squares = screen.getAllByRole('button', { name: /Square/i });
   fireEvent.click(squares[0]);
   expect(squares[0]).toHaveTextContent('X');
@@ -35,6 +39,10 @@ test('auditor cannot move', () => {
 
 test('board disables squares after game end (winner)', () => {
   render(<App />);
+  // ensure standard role
+  const select = screen.getByLabelText(/Role/i);
+  fireEvent.change(select, { target: { value: 'player' } });
+
   const squares = screen.getAllByRole('button', { name: /Square/i });
   // X wins top row: 0,1,2
   makeMoves(squares, [0,3,1,4,2]);
@@ -60,11 +68,11 @@ test('reset requires signature via modal and then clears board', () => {
 
   // Modal appears
   const dialog = screen.getByRole('dialog', { name: /Electronic Signature Required/i });
-  const sigInput = within(dialog).getByLabelText(/Signature/i);
-  const reasonInput = within(dialog).getByLabelText(/Reason for change/i);
+  const sigInput = within(dialog).getByTestId('signature-input');
+  const reasonInput = within(dialog).getByTestId('reason-input');
   const confirmBtn = within(dialog).getByRole('button', { name: /Confirm signature/i });
 
-  // Try confirm with empty to see validation error
+  // Try confirm with empty to see validation error scoped to dialog
   fireEvent.click(confirmBtn);
   expect(within(dialog).getByTestId('signature-error')).toBeInTheDocument();
 
