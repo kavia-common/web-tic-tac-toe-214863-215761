@@ -5,6 +5,7 @@ import { AuditTrailProvider, useAudit } from '../../state/AuditContext';
 
 // Helper provider to wrap hook with context, default role player for unauthorized scenarios
 function Wrapper({ children }) {
+  // provider defaults currentUser role to 'player' in hook through context (fallback)
   return <AuditTrailProvider>{children}</AuditTrailProvider>;
 }
 
@@ -44,14 +45,14 @@ describe('useTicTacToe hook', () => {
     // Ensure an error audit record appended with VALIDATION_ERROR
     const errorEvt = result.current.events.find(e => e.actionType === 'ERROR' && e.entity === 'Move');
     expect(errorEvt).toBeTruthy();
-    // Error code should be VALIDATION_ERROR for invalid index
-    expect(errorEvt.error).toMatch(/VALIDATION_ERROR/);
+    // Error string uses single-prefix "CODE: message"
+    expect(errorEvt.error).toMatch(/^VALIDATION_ERROR:\s/i);
     expect(typeof errorEvt.timestamp).toBe('string');
     expect(errorEvt.timestamp).toMatch(/T/);
     consoleSpy.mockRestore();
   });
 
-  test('cannot play on occupied square -> error audit', () => {
+  test('cannot play on occupied square -> BUSINESS_RULE error audit', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     const { result } = renderHook(() => {
       const ttt = useTicTacToe();
@@ -60,15 +61,16 @@ describe('useTicTacToe hook', () => {
     }, { wrapper: Wrapper });
 
     act(() => result.current.makeMove(0)); // X
-    act(() => result.current.makeMove(0)); // invalid
+    act(() => result.current.makeMove(0)); // invalid occupied
 
     const err = result.current.events.find(e => e.actionType === 'ERROR' && e.entity === 'Move');
     expect(err).toBeTruthy();
-    expect(err.error).toMatch(/BUSINESS_RULE/);
+    expect(err.error).toMatch(/^BUSINESS_RULE:\s/i);
+    expect(err.error).toMatch(/already occupied/i);
     consoleSpy.mockRestore();
   });
 
-  test('winner detection (X wins top row) disables further moves', () => {
+  test('winner detection (X wins top row) disables further moves -> BUSINESS_RULE Game already ended', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     const { result } = renderHook(() => {
       const ttt = useTicTacToe();
@@ -84,17 +86,18 @@ describe('useTicTacToe hook', () => {
 
     expect(result.current.winner).toBe('X');
 
-    // attempt further move should generate error audit (game ended)
+    // attempt further move should generate BUSINESS_RULE: Game already ended
     const before = result.current.current.squares.slice();
     act(() => result.current.makeMove(5));
     expect(result.current.current.squares).toEqual(before);
     const err = result.current.events.find(e => e.actionType === 'ERROR' && e.entity === 'Move');
     expect(err).toBeTruthy();
-    expect(err.error).toMatch(/Game already ended/);
+    expect(err.error).toMatch(/^BUSINESS_RULE:\s/i);
+    expect(err.error).toMatch(/Game already ended/i);
     consoleSpy.mockRestore();
   });
 
-  test('draw detection when board filled without winner blocks further moves', () => {
+  test('draw detection when board filled without winner blocks further moves -> BUSINESS_RULE Game already ended', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     const { result } = renderHook(() => {
       const ttt = useTicTacToe();
@@ -112,7 +115,8 @@ describe('useTicTacToe hook', () => {
     expect(result.current.current.squares).toEqual(before);
     const err = result.current.events.find(e => e.actionType === 'ERROR' && e.entity === 'Move');
     expect(err).toBeTruthy();
-    expect(err.error).toMatch(/Game already ended/);
+    expect(err.error).toMatch(/^BUSINESS_RULE:\s/i);
+    expect(err.error).toMatch(/Game already ended/i);
     consoleSpy.mockRestore();
   });
 
@@ -128,7 +132,7 @@ describe('useTicTacToe hook', () => {
     act(() => result.current.jumpTo(0));
     const errByPlayer = result.current.events.find(e => e.actionType === 'ERROR' && e.entity === 'Jump');
     expect(errByPlayer).toBeTruthy();
-    expect(errByPlayer.error).toMatch(/AUTHZ_ERROR/);
+    expect(errByPlayer.error).toMatch(/^AUTHZ_ERROR:\s/i);
 
     // Change role to admin and try jump again
     act(() => result.current.setCurrentUser({ id: 'user1', role: 'admin' }));
@@ -151,14 +155,13 @@ describe('useTicTacToe hook', () => {
     // verify default role is player
     expect(result.current.currentUser?.role || 'player').toBe('player');
 
-    // player cannot reset -> error
+    // player cannot reset -> AUTHZ_ERROR single-prefixed format
     act(() => {
       result.current.resetGame('because', { signature: 'sigA', reason: 'because' });
     });
-    // read events after act to ensure flush
     const errByPlayer = result.current.events.find(e => e.actionType === 'ERROR' && e.entity === 'Reset');
     expect(errByPlayer).toBeTruthy();
-    expect(errByPlayer.error).toMatch(/AUTHZ_ERROR/);
+    expect(errByPlayer.error).toMatch(/^AUTHZ_ERROR:\s/i);
 
     // switch to admin and reset
     act(() => {

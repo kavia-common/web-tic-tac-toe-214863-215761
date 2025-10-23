@@ -20,6 +20,7 @@ describe('validateSignature', () => {
 });
 
 describe('move validations', () => {
+  // VALIDATION_ERROR expectation
   test('validateMoveIndex throws on non-integer or out-of-range', () => {
     expect.assertions(8);
     try { validateMoveIndex(-1); } catch (e) { expect(e.code).toBe('VALIDATION_ERROR'); expect(e.message).toMatch(/integer between 0 and 8/); }
@@ -28,6 +29,7 @@ describe('move validations', () => {
     try { /* @ts-ignore */ validateMoveIndex('2'); } catch (e) { expect(e.code).toBe('VALIDATION_ERROR'); expect(e.message).toMatch(/integer between 0 and 8/); }
   });
 
+  // BUSINESS_RULE expectations
   test('validateSquareAvailable throws when occupied', () => {
     const squares = Array(9).fill(null);
     squares[0] = 'X';
