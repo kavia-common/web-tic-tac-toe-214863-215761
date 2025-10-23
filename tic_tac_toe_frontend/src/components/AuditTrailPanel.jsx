@@ -39,7 +39,11 @@ function AuditTrailPanel({ events }) {
               <span className="audit-entity">{evt.entity}</span>
             </div>
             {evt.reason ? <div className="audit-reason">Reason: {evt.reason}</div> : null}
-            {evt.error ? <div className="audit-error">Error: {evt.error}</div> : null}
+            {evt.error ? (
+              <div className="audit-error" data-testid="audit-error-text">
+                Error: {evt.error}
+              </div>
+            ) : null}
           </li>
         ))}
       </ul>

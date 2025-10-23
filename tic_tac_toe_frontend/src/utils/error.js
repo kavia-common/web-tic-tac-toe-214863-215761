@@ -67,14 +67,18 @@ export function formatError(err) {
   if (err === null || typeof err === 'undefined') {
     return 'UNKNOWN: Unknown error';
   }
+  // If provided a plain string (not an Error object), treat it as an unknown error message with UNKNOWN code
+  if (typeof err === 'string') {
+    const stripped = err.replace(/^([A-Z_]+):\s*/,'').trim() || 'Unknown error';
+    return `UNKNOWN: ${stripped}`;
+  }
+
   const code = normalizeErrorCode(err?.code || 'ERROR');
 
   // Determine a raw message string
   let rawMessage = '';
   if (err && typeof err.message === 'string') {
     rawMessage = err.message;
-  } else if (typeof err === 'string') {
-    rawMessage = err;
   } else {
     try {
       rawMessage = JSON.stringify(err);

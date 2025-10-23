@@ -130,7 +130,11 @@ export function useTicTacToe() {
           e = makeError('BUSINESS_RULE', msg);
         }
       }
-      auditWrap('ERROR', 'Move', before, before, { error: formatError(e) });
+      auditWrap('ERROR', 'Move', before, before, {
+        error: formatError(e),
+        errorCode: e.code || 'ERROR',
+        errorMessage: e?.message || 'Unknown error'
+      });
       // eslint-disable-next-line no-console
       console.error(e);
     }
@@ -161,7 +165,11 @@ export function useTicTacToe() {
           ? makeError('AUTHZ_ERROR', msg)
           : makeError('BUSINESS_RULE', msg);
       }
-      auditWrap('ERROR', 'Reset', before, before, { error: formatError(e) });
+      auditWrap('ERROR', 'Reset', before, before, {
+        error: formatError(e),
+        errorCode: e.code || 'ERROR',
+        errorMessage: e?.message || 'Unknown error'
+      });
       // eslint-disable-next-line no-console
       console.error(e);
     }
@@ -183,7 +191,11 @@ export function useTicTacToe() {
       const msg = String(err && err.message ? err.message : err);
       const isAuth = err && err.code === 'AUTHZ_ERROR';
       const e = isAuth ? err : makeError(/invalid|range|index|out of/i.test(msg) ? 'VALIDATION_ERROR' : 'BUSINESS_RULE', msg);
-      auditWrap('ERROR', 'Jump', before, before, { error: formatError(e) });
+      auditWrap('ERROR', 'Jump', before, before, {
+        error: formatError(e),
+        errorCode: e.code || 'ERROR',
+        errorMessage: e?.message || 'Unknown error'
+      });
       // eslint-disable-next-line no-console
       console.error(e);
     }
