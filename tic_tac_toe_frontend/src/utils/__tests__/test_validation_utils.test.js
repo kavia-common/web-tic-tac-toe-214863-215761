@@ -24,7 +24,7 @@ describe('move validations', () => {
     expect(() => validateMoveIndex(-1)).toThrow(/VALIDATION_ERROR/);
     expect(() => validateMoveIndex(9)).toThrow(/VALIDATION_ERROR/);
     expect(() => validateMoveIndex(1.5)).toThrow(/VALIDATION_ERROR/);
-    expect(() => validateMoveIndex('2')).toThrow(); // type error
+    expect(() => validateMoveIndex('2')).toThrow(/VALIDATION_ERROR/); // type error standardized
   });
 
   test('validateSquareAvailable throws when occupied', () => {
