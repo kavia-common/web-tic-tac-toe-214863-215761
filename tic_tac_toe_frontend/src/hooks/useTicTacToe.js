@@ -19,7 +19,7 @@ import {
   validateGameNotEnded,
 } from '../utils/validation';
 import { buildAuditRecord } from '../utils/audit';
-import { formatError, makeError } from '../utils/error';
+import { formatError, makeError, normalizeError } from '../utils/error';
 import { useAudit } from '../state/AuditContext';
 import { hasPermission } from '../utils/accessControl';
 
@@ -135,11 +135,12 @@ export function useTicTacToe() {
           e = makeError('BUSINESS_RULE', msg);
         }
       }
-      // Push ERROR audit with structured payload
+      // Push ERROR audit with structured payload and user-facing formatted string
+      const structured = normalizeError(e);
       auditWrap('ERROR', 'Move', before, before, {
-        error: formatError(e),
-        errorCode: e.code || 'ERROR',
-        errorMessage: e?.message || 'Unknown error'
+        error: formatError(structured),
+        errorCode: structured.errorCode,
+        errorMessage: structured.errorMessage
       });
       // eslint-disable-next-line no-console
       console.error(e);
@@ -171,11 +172,11 @@ export function useTicTacToe() {
           ? makeError('AUTHZ_ERROR', msg)
           : makeError('BUSINESS_RULE', msg);
       }
-      // Push ERROR audit with AUTHZ_ERROR or other code and structured payloads
+      const structured = normalizeError(e);
       auditWrap('ERROR', 'Reset', before, before, {
-        error: formatError(e),
-        errorCode: e.code || 'ERROR',
-        errorMessage: e?.message || 'Unknown error'
+        error: formatError(structured),
+        errorCode: structured.errorCode,
+        errorMessage: structured.errorMessage
       });
       // eslint-disable-next-line no-console
       console.error(e);
@@ -198,11 +199,11 @@ export function useTicTacToe() {
       const msg = String(err && err.message ? err.message : err);
       const isAuth = err && err.code === 'AUTHZ_ERROR';
       const e = isAuth ? err : makeError(/invalid|range|index|out of/i.test(msg) ? 'VALIDATION_ERROR' : 'BUSINESS_RULE', msg);
-      // Push structured ERROR audit payload
+      const structured = normalizeError(e);
       auditWrap('ERROR', 'Jump', before, before, {
-        error: formatError(e),
-        errorCode: e.code || 'ERROR',
-        errorMessage: e?.message || 'Unknown error'
+        error: formatError(structured),
+        errorCode: structured.errorCode,
+        errorMessage: structured.errorMessage
       });
       // eslint-disable-next-line no-console
       console.error(e);

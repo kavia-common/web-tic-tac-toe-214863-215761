@@ -41,10 +41,10 @@ function AuditTrailPanel({ events }) {
             {evt.reason ? <div className="audit-reason">Reason: {evt.reason}</div> : null}
             {evt.error ? (
               <div className="audit-error" data-testid="audit-error-text">
-                {/* Single visible node containing full error text for query stability */}
-                <span data-testid="audit-error-fulltext">Error: {evt.error}</span>
-                {/* Additional test id some tests look for */}
-                <span style={{display:'none'}} data-testid="audit-error-line">{evt.error}</span>
+                {/* Single full-text node for UI queries */}
+                <span data-testid="audit-error-fulltext">{evt.error}</span>
+                {/* Single line node (hidden) strictly for selector compatibility */}
+                <span data-testid="audit-error-line" style={{ display: 'none' }}>{evt.error}</span>
               </div>
             ) : null}
           </li>

@@ -53,52 +53,83 @@ export function makeError(code, message) {
 }
 
 /**
+ * Strip existing leading PREFIX: from a message string to avoid double-prefixing.
+ * @param {string} msg
+ * @returns {string}
+ */
+function stripExistingPrefix(msg) {
+  if (!msg) return '';
+  const m = String(msg).match(/^([A-Z_]+):\s*(.*)$/);
+  return m ? (m[2] || '') : msg;
+}
+
+/**
+ * PUBLIC_INTERFACE
+ * normalizeError
+ * This is a public function.
+ * Normalize any input into a structured error payload { errorCode, errorMessage }.
+ * - Strings become UNKNOWN with stripped prefix
+ * - null/undefined -> UNKNOWN: Unknown error
+ * - Errors with code/message are normalized and message is de-prefixed
+ * @param {any} input
+ * @returns {{ errorCode: 'VALIDATION_ERROR'|'BUSINESS_RULE'|'AUTHZ_ERROR'|'UNKNOWN'|'ERROR', errorMessage: string }}
+ */
+export function normalizeError(input) {
+  if (input === null || typeof input === 'undefined') {
+    return { errorCode: 'UNKNOWN', errorMessage: 'Unknown error' };
+  }
+  if (typeof input === 'string') {
+    return { errorCode: 'UNKNOWN', errorMessage: stripExistingPrefix(input).trim() || 'Unknown error' };
+  }
+  // Likely Error-like
+  const code = normalizeErrorCode(input?.code || '');
+  const message =
+    typeof input?.message === 'string'
+      ? stripExistingPrefix(input.message).trim() || 'Unknown error'
+      : 'Unknown error';
+  // Preserve UNKNOWN when nothing is identifiable
+  if (!['BUSINESS_RULE', 'VALIDATION_ERROR', 'AUTHZ_ERROR'].includes(code)) {
+    if (!input?.code) {
+      return { errorCode: 'ERROR', errorMessage: message };
+    }
+  }
+  return { errorCode: code || 'ERROR', errorMessage: message };
+}
+
+/**
  * PUBLIC_INTERFACE
  * formatError
  * This is a public function.
- * Formats error into a single-prefixed string with exact prefixes:
- *  - 'BUSINESS_RULE: ...'
- *  - 'VALIDATION_ERROR: ...'
- *  - 'AUTHZ_ERROR: ...'
- *  - 'UNKNOWN: Unknown error' for null/undefined
- * For plain string inputs, returns 'UNKNOWN: <message-without-existing-prefix>'.
- * @param {any} err
+ * Formats structured error into exact user-facing strings:
+ *  - 'Business Rule: …' for BUSINESS_RULE
+ *  - 'Validation Error: …' for VALIDATION_ERROR
+ *  - 'Authorization Error: …' for AUTHZ_ERROR
+ *  - 'Unknown Error: …' for UNKNOWN or null
+ * Never JSON-stringify in user-facing strings, and strip any existing prefixes.
+ * Accepts either raw value or an object with errorCode/errorMessage, or Error-like.
+ * @param {any} input
  * @returns {string}
  */
-export function formatError(err) {
-  // Explicit handling for null/undefined
-  if (err === null || typeof err === 'undefined') {
-    return 'UNKNOWN: Unknown error';
+export function formatError(input) {
+  const normalized =
+    input && typeof input === 'object' && 'errorCode' in input && 'errorMessage' in input
+      ? /** already structured */ { errorCode: input.errorCode, errorMessage: stripExistingPrefix(input.errorMessage) }
+      : normalizeError(input);
+
+  const code = normalized.errorCode || 'UNKNOWN';
+  const msg = stripExistingPrefix(normalized.errorMessage || '').trim() || 'Unknown error';
+
+  switch (code) {
+    case 'BUSINESS_RULE':
+      return `Business Rule: ${msg}`;
+    case 'VALIDATION_ERROR':
+      return `Validation Error: ${msg}`;
+    case 'AUTHZ_ERROR':
+      return `Authorization Error: ${msg}`;
+    case 'UNKNOWN':
+      return `Unknown Error: ${msg}`;
+    default:
+      // For ERROR or any other unmapped codes, treat as Unknown
+      return `Unknown Error: ${msg}`;
   }
-
-  // For plain string inputs, treat as UNKNOWN and strip any existing prefix to avoid double prefixing
-  if (typeof err === 'string') {
-    const stripped = err.replace(/^([A-Z_]+):\s*/,'').trim() || 'Unknown error';
-    return `UNKNOWN: ${stripped}`;
-  }
-
-  // Normalize code strictly to the three known categories; otherwise fall back to ERROR
-  const normalized = normalizeErrorCode(err?.code || '');
-  const code = ['BUSINESS_RULE', 'VALIDATION_ERROR', 'AUTHZ_ERROR'].includes(normalized)
-    ? normalized
-    : (normalized || 'ERROR');
-
-  // Determine a raw message string
-  let rawMessage = '';
-  if (err && typeof err.message === 'string') {
-    rawMessage = err.message;
-  } else {
-    try {
-      rawMessage = JSON.stringify(err);
-    } catch {
-      rawMessage = String(err);
-    }
-  }
-
-  // Strip any pre-existing CODE: prefix from the message to avoid double prefixing
-  const prefixMatch = String(rawMessage).match(/^([A-Z_]+):\s*(.*)$/);
-  const message = prefixMatch ? (prefixMatch[2] || '') : rawMessage;
-
-  const finalMessage = message && message.trim().length ? message.trim() : 'Unknown error';
-  return `${code}: ${finalMessage}`;
 }

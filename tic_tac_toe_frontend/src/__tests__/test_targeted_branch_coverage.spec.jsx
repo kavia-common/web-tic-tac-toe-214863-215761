@@ -33,13 +33,13 @@ describe('Targeted branch coverage tests', () => {
         actionType: 'ERROR',
         entity: 'Move',
         reason: 'Make move',
-        error: formatError(makeError('BUSINESS_RULE', 'Selected square is already occupied.')),
+        error: formatError({ errorCode: 'BUSINESS_RULE', errorMessage: 'Selected square is already occupied.' }),
       }
     ];
     render(<AuditTrailPanel events={events} />);
     const panel = screen.getByTestId('audit-panel');
     const fulltext = within(panel).getByTestId('audit-error-fulltext');
-    expect(fulltext).toHaveTextContent('BUSINESS_RULE: Selected square is already occupied.');
+    expect(fulltext).toHaveTextContent('Business Rule: Selected square is already occupied.');
     // hidden compatibility node
     const hidden = within(panel).getByTestId('audit-error-line');
     expect(hidden).toBeInTheDocument();
@@ -94,8 +94,8 @@ describe('Targeted branch coverage tests', () => {
     render(<App />);
     const auditPanel = screen.getByTestId('audit-panel');
     const texts = within(auditPanel).getAllByTestId('audit-error-fulltext').map(n => n.textContent || '');
-    // Ensure at least one entry includes Game already ended
-    expect(texts.some(t => /BUSINESS_RULE: Game already ended\./.test(t))).toBe(true);
+    // Ensure at least one entry includes Game already ended with standardized prefix
+    expect(texts.some(t => /Business Rule: Game already ended\./.test(t))).toBe(true);
   });
 
   test('useTicTacToe jumpTo validation path and AUTHZ path', () => {
@@ -117,6 +117,6 @@ describe('Targeted branch coverage tests', () => {
     render(<App />);
     const auditPanel = screen.getByTestId('audit-panel');
     const texts = within(auditPanel).getAllByTestId('audit-error-fulltext').map(n => n.textContent || '');
-    expect(texts.some(t => /^VALIDATION_ERROR: /.test(t))).toBe(true);
+    expect(texts.some(t => /^Validation Error: /.test(t))).toBe(true);
   });
 });

@@ -14,14 +14,14 @@ test('renders error fulltext in single node for toHaveTextContent', () => {
     actionType: 'ERROR',
     entity: 'Move',
     reason: 'Make move',
-    error: 'BUSINESS_RULE: Game already ended.'
+    error: 'Business Rule: Game already ended.'
   }];
 
   const { container } = render(<AuditTrailPanel events={events} />);
   const panel = screen.getByTestId('audit-panel');
   const errorDiv = within(panel).getByTestId('audit-error-text');
   const fullText = within(errorDiv).getByTestId('audit-error-fulltext');
-  expect(fullText).toHaveTextContent('Error: BUSINESS_RULE: Game already ended.');
+  expect(fullText).toHaveTextContent('Business Rule: Game already ended.');
   // Also ensure container content includes the full text
-  expect(container).toHaveTextContent('Error: BUSINESS_RULE: Game already ended.');
+  expect(container).toHaveTextContent('Business Rule: Game already ended.');
 });
