@@ -107,7 +107,8 @@ describe('useTicTacToe hook', () => {
     // Sequence to achieve a draw
     const seq = [0,1,2,4,3,5,7,6,8]; // results in draw
     seq.forEach(i => act(() => result.current.makeMove(i)));
-    expect(result.current.wwinner).toBeUndefined(); // winner is not set (should be null)
+    // winner should be null on draw
+    expect(result.current.winner).toBe(null);
     expect(result.current.isDraw).toBe(true);
 
     const before = result.current.current.squares.slice();

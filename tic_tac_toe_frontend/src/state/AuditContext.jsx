@@ -45,7 +45,10 @@ export function AuditTrailProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(() => {
     try {
       const raw = window.localStorage.getItem(USER_STORAGE_KEY);
-      return raw ? JSON.parse(raw) : { id: 'user1', role: 'player' };
+      const parsed = raw ? JSON.parse(raw) : null;
+      // default role='player' for unauthorized scenarios if not present
+      if (!parsed) return { id: 'user1', role: 'player' };
+      return { id: parsed.id || 'user1', role: parsed.role || 'player' };
     } catch {
       return { id: 'user1', role: 'player' };
     }

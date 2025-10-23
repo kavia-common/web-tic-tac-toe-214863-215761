@@ -36,6 +36,7 @@ describe('error utils', () => {
   test('formatError prefixes only once even if message already contains code', () => {
     const e = makeError('BUSINESS_RULE', 'BUSINESS_RULE: Selected square is already occupied.');
     const msg = formatError(e);
+    // message should be single-prefixed, not BUSINESS_RULE: BUSINESS_RULE: ...
     expect(msg).toBe('BUSINESS_RULE: Selected square is already occupied.');
   });
 });

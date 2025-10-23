@@ -28,6 +28,7 @@ describe('ModalSignature component', () => {
     const dialog = screen.getByRole('dialog', { name: /Electronic Signature Required/i });
     const confirmBtn = within(dialog).getByTestId('confirm-signature');
     fireEvent.click(confirmBtn);
+    // keep queries scoped within active dialog
     const alert = within(dialog).getByTestId('signature-error');
     expect(alert).toBeInTheDocument();
     expect(alert).toHaveTextContent(/Signature required/i);

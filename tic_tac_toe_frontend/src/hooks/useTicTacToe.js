@@ -90,11 +90,12 @@ export function useTicTacToe() {
       if (!hasPermission(currentUser?.role, 'move')) {
         throw makeError('AUTHZ_ERROR', 'User lacks permission to move.');
       }
-      // Business rules first: post-game and occupied square before index validation
+      // Business rules and validation ordering:
+      // 1) Game already ended
       validateGameNotEnded(winner, isDraw);
+      // 2) Occupied square (BUSINESS_RULE) should surface before raw index errors
       validateSquareAvailable(current.squares, index);
-
-      // Input validation after biz-rule screening
+      // 3) Input index validation
       validateMoveIndex(index);
 
       // Alternation rule
