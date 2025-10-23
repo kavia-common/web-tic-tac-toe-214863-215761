@@ -1,4 +1,4 @@
-import { makeError, formatError } from '../error';
+import { makeError, formatError, normalizeErrorCode } from '../error';
 
 describe('error utils', () => {
   test('makeError sets code and message', () => {
@@ -6,6 +6,14 @@ describe('error utils', () => {
     expect(err).toBeInstanceOf(Error);
     expect(err.code).toBe('FOO');
     expect(err.message).toBe('bar');
+  });
+
+  test('normalizeErrorCode maps variants to standardized categories', () => {
+    expect(normalizeErrorCode('validation')).toBe('VALIDATION_ERROR');
+    expect(normalizeErrorCode('BUSINESS_RULE_VIOLATION')).toBe('BUSINESS_RULE');
+    expect(normalizeErrorCode('unauthorized')).toBe('AUTHZ_ERROR');
+    expect(normalizeErrorCode('forbidden')).toBe('AUTHZ_ERROR');
+    expect(normalizeErrorCode('authz_error')).toBe('AUTHZ_ERROR');
   });
 
   test('formatError handles null/undefined', () => {

@@ -10,7 +10,27 @@
  // Validation Protocol: VP-ERR-001
  // ============================================================================
  */
-
+ 
+ /**
+  * PUBLIC_INTERFACE
+  * normalizeErrorCode
+  * This is a public function.
+  * Normalizes a raw error code/string to one of:
+  * - VALIDATION_ERROR
+  * - BUSINESS_RULE
+  * - AUTHZ_ERROR
+  * - ERROR (fallback)
+  * @param {string} raw
+  * @returns {'VALIDATION_ERROR'|'BUSINESS_RULE'|'AUTHZ_ERROR'|'ERROR'}
+  */
+ export function normalizeErrorCode(raw) {
+   const c = String(raw || '').toUpperCase();
+   if (c.includes('VALIDATION')) return 'VALIDATION_ERROR';
+   if (c.includes('BUSINESS')) return 'BUSINESS_RULE';
+   if (c.includes('AUTHZ') || c.includes('UNAUTHORIZED') || c.includes('FORBIDDEN')) return 'AUTHZ_ERROR';
+   return c || 'ERROR';
+ }
+ 
  /**
   * PUBLIC_INTERFACE
   * makeError
@@ -22,21 +42,13 @@
   * @returns {Error & {code:string}}
   */
  export function makeError(code, message) {
-   // Normalize categories to the agreed prefixes
-   const normalized = (() => {
-     const c = String(code || '').toUpperCase();
-     if (c.includes('VALIDATION')) return 'VALIDATION_ERROR';
-     if (c.includes('BUSINESS')) return 'BUSINESS_RULE';
-     if (c.includes('AUTHZ') || c.includes('UNAUTHORIZED') || c.includes('FORBIDDEN')) return 'AUTHZ_ERROR';
-     return c || 'ERROR';
-   })();
-
+   const normalized = normalizeErrorCode(code);
    const e = new Error(String(message || ''));
    // @ts-ignore
    e.code = normalized;
    return e;
  }
-
+ 
  /**
   * PUBLIC_INTERFACE
   * formatError
@@ -48,14 +60,7 @@
   */
  export function formatError(err) {
    if (!err) return 'UNKNOWN: Unknown error';
-   const rawCode = err.code || 'ERROR';
-   const code = (() => {
-     const c = String(rawCode || '').toUpperCase();
-     if (c.includes('VALIDATION')) return 'VALIDATION_ERROR';
-     if (c.includes('BUSINESS')) return 'BUSINESS_RULE';
-     if (c.includes('AUTHZ') || c.includes('UNAUTHORIZED') || c.includes('FORBIDDEN')) return 'AUTHZ_ERROR';
-     return c || 'ERROR';
-   })();
+   const code = normalizeErrorCode(err.code || 'ERROR');
    const message = err.message || String(err);
    return `${code}: ${message}`;
  }

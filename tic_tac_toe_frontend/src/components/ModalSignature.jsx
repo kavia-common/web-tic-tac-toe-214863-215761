@@ -62,6 +62,7 @@ function ModalSignature({ open, onConfirm, onCancel }) {
       aria-modal="true"
       aria-labelledby="signature-title"
       aria-describedby="signature-desc"
+      aria-label="Electronic Signature Required"
       ref={dialogRef}
       data-testid="signature-modal"
     >
