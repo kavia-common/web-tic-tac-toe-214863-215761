@@ -26,7 +26,7 @@ describe('ModalSignature component', () => {
   test('validation error on empty submit shows alert', () => {
     render(<ModalSignature open={true} onConfirm={jest.fn()} onCancel={jest.fn()} />);
     const dialog = screen.getByRole('dialog', { name: /Electronic Signature Required/i });
-    const confirmBtn = within(dialog).getByRole('button', { name: /Confirm signature/i });
+    const confirmBtn = within(dialog).getByRole('button', { name: /Confirm Signature/i });
     fireEvent.click(confirmBtn);
     // scope alert lookup within the dialog to avoid cross-modal interference
     const alert = within(dialog).getByRole('alert');

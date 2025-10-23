@@ -142,6 +142,7 @@ export function useTicTacToe() {
         throw makeError('AUTHZ_ERROR', 'User lacks permission to jump.');
       }
       if (typeof moveIndex !== 'number' || moveIndex < 0 || moveIndex >= history.length) {
+        // Standardize validation category
         throw makeError('VALIDATION_ERROR', 'Invalid move index for jump.');
       }
       setStep(moveIndex);

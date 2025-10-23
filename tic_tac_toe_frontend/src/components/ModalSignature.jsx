@@ -65,13 +65,13 @@ function ModalSignature({ open, onConfirm, onCancel }) {
       ref={dialogRef}
       data-testid="signature-modal"
     >
-      <div className="modal">
+      <div className="modal" data-testid="signature-modal-container">
         <h3 id="signature-title">Electronic Signature Required</h3>
         <p id="signature-desc" className="sr-only">
           Provide your electronic signature and a reason for the action, then press Confirm Signature to proceed or Cancel Signature to abort.
         </p>
         <div className="form-group">
-          <label htmlFor="signature-input">Signature</label>
+          <label htmlFor="signature-input">Signature (type your password)</label>
           <input
             id="signature-input"
             ref={sigRef}
@@ -82,6 +82,7 @@ function ModalSignature({ open, onConfirm, onCancel }) {
             placeholder="Enter your signature"
             name="signature"
             autoComplete="current-password"
+            data-testid="signature-input"
           />
         </div>
         <div className="form-group">
@@ -95,6 +96,7 @@ function ModalSignature({ open, onConfirm, onCancel }) {
             placeholder="Describe why this change is necessary"
             name="reason"
             autoComplete="off"
+            data-testid="reason-input"
           />
         </div>
         {error ? (
@@ -106,16 +108,18 @@ function ModalSignature({ open, onConfirm, onCancel }) {
           <button
             className="btn"
             onClick={handleConfirm}
-            aria-label="Confirm signature"
+            aria-label="Confirm Signature"
             name="confirm-signature"
+            data-testid="confirm-signature"
           >
             Confirm Signature
           </button>
           <button
             className="btn btn-secondary"
             onClick={onCancel}
-            aria-label="Cancel signature"
+            aria-label="Cancel Signature"
             name="cancel-signature"
+            data-testid="cancel-signature"
           >
             Cancel Signature
           </button>
