@@ -44,7 +44,8 @@
  export function makeError(code, message) {
    const normalized = normalizeErrorCode(code);
    const baseMessage = String(message || '');
-   // Create Error with plain message; code is carried separately on the object
+   // Create Error with plain message; code is carried separately on the object.
+   // Avoid embedding the code in the message so tests can assert err.code and plain messages.
    const e = new Error(baseMessage);
    // @ts-ignore
    e.code = normalized;
@@ -73,5 +74,6 @@
    const prefixMatch = rawMessage.match(/^([A-Z_]+):\s*(.*)$/);
    const message = prefixMatch ? (prefixMatch[2] || '') : rawMessage;
    const finalMessage = message && message.trim().length ? message : 'Unknown error';
+   // Single standardized prefix via formatError
    return `${code}: ${finalMessage}`;
  }

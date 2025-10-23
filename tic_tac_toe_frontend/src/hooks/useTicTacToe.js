@@ -124,6 +124,7 @@ export function useTicTacToe() {
           ? makeError('VALIDATION_ERROR', msg)
           : makeError('BUSINESS_RULE', msg);
       }
+      // Use a single prefix format for audit strings
       auditWrap('ERROR', 'Move', before, before, { error: formatError(e) });
       // eslint-disable-next-line no-console
       console.error(e);
