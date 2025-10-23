@@ -29,7 +29,9 @@ describe('ModalSignature component', () => {
     const confirmBtn = within(dialog).getByRole('button', { name: /Confirm signature/i });
     fireEvent.click(confirmBtn);
     // scope alert lookup within the dialog to avoid cross-modal interference
-    expect(within(dialog).getByRole('alert')).toBeInTheDocument();
+    const alert = within(dialog).getByRole('alert');
+    expect(alert).toBeInTheDocument();
+    expect(alert).toHaveTextContent(/Signature required/i);
   });
 
   test('missing reason shows validation error and blocks submit', () => {
@@ -41,7 +43,8 @@ describe('ModalSignature component', () => {
 
     fireEvent.change(sigInput, { target: { value: 'ok' } });
     fireEvent.click(confirmBtn);
-    expect(within(dialog).getByRole('alert')).toHaveTextContent(/Reason required/);
+    const alert = within(dialog).getByRole('alert');
+    expect(alert).toHaveTextContent(/Reason required/i);
     expect(onConfirm).not.toHaveBeenCalled();
   });
 
