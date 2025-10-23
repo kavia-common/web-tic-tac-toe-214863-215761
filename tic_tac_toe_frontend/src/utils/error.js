@@ -74,6 +74,6 @@
    const prefixMatch = rawMessage.match(/^([A-Z_]+):\s*(.*)$/);
    const message = prefixMatch ? (prefixMatch[2] || '') : rawMessage;
    const finalMessage = message && message.trim().length ? message : 'Unknown error';
-   // Single standardized prefix via formatError
-   return `${code}: ${finalMessage}`;
+   // Ensure the result is a single-prefixed string, trimming whitespace consistently
+   return `${code}: ${finalMessage}`.replace(/\s+$/, '');
  }

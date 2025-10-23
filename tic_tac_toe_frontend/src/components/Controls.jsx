@@ -38,6 +38,7 @@ function Controls({ onReset, onJump, historyLabels, onExportAudit, permissions }
           disabled={!permissions.canReset}
           aria-disabled={!permissions.canReset}
           aria-label="Reset game"
+          data-testid="btn-reset-game"
         >
           Reset
         </button>
@@ -48,6 +49,7 @@ function Controls({ onReset, onJump, historyLabels, onExportAudit, permissions }
           disabled={!permissions.canExport}
           aria-disabled={!permissions.canExport}
           aria-label="Export audit trail"
+          data-testid="btn-export-audit"
         >
           Export Audit
         </button>
@@ -62,6 +64,7 @@ function Controls({ onReset, onJump, historyLabels, onExportAudit, permissions }
             disabled={!permissions.canJump}
             aria-disabled={!permissions.canJump}
             aria-label={`Jump to move ${idx}`}
+            data-testid={`btn-jump-${idx}`}
           >
             {label}
           </button>
