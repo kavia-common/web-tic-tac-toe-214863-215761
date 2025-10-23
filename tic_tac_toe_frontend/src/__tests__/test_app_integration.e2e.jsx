@@ -135,11 +135,11 @@ describe('App integration - end-to-end flows', () => {
     const resetBtn = screen.getByRole('button', { name: /Reset game/i });
     fireEvent.click(resetBtn);
 
-    // Modal present and validation fires
+    // Modal present and validation fires - scope all queries within active dialog
     const dialog = screen.getByRole('dialog', { name: /Electronic Signature Required/i });
-    const sigInput = within(dialog).getByLabelText(/Signature/i);
-    const reasonInput = within(dialog).getByLabelText(/Reason for change/i);
-    const confirmBtn = within(dialog).getByRole('button', { name: /Confirm signature/i });
+    const sigInput = within(dialog).getByTestId('signature-input');
+    const reasonInput = within(dialog).getByTestId('reason-input');
+    const confirmBtn = within(dialog).getByTestId('confirm-signature');
 
     fireEvent.click(confirmBtn);
     expect(within(dialog).getByTestId('signature-error')).toBeInTheDocument();

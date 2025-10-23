@@ -26,7 +26,7 @@ describe('ModalSignature component', () => {
   test('validation error on empty submit shows alert', () => {
     render(<ModalSignature open={true} onConfirm={jest.fn()} onCancel={jest.fn()} />);
     const dialog = screen.getByRole('dialog', { name: /Electronic Signature Required/i });
-    const confirmBtn = within(dialog).getByRole('button', { name: /Confirm Signature/i });
+    const confirmBtn = within(dialog).getByTestId('confirm-signature');
     fireEvent.click(confirmBtn);
     const alert = within(dialog).getByTestId('signature-error');
     expect(alert).toBeInTheDocument();
@@ -38,7 +38,7 @@ describe('ModalSignature component', () => {
     render(<ModalSignature open={true} onConfirm={onConfirm} onCancel={jest.fn()} />);
     const dialog = screen.getByRole('dialog', { name: /Electronic Signature Required/i });
     const sigInput = within(dialog).getByTestId('signature-input');
-    const confirmBtn = within(dialog).getByRole('button', { name: /Confirm signature/i });
+    const confirmBtn = within(dialog).getByTestId('confirm-signature');
 
     fireEvent.change(sigInput, { target: { value: 'ok' } });
     fireEvent.click(confirmBtn);
@@ -53,7 +53,7 @@ describe('ModalSignature component', () => {
     const dialog = screen.getByRole('dialog', { name: /Electronic Signature Required/i });
     const sigInput = within(dialog).getByTestId('signature-input');
     const reasonInput = within(dialog).getByTestId('reason-input');
-    const confirmBtn = within(dialog).getByRole('button', { name: /Confirm signature/i });
+    const confirmBtn = within(dialog).getByTestId('confirm-signature');
 
     fireEvent.change(sigInput, { target: { value: 'secret123' } });
     fireEvent.change(reasonInput, { target: { value: 'reset for test' } });
@@ -67,7 +67,7 @@ describe('ModalSignature component', () => {
     const onConfirm = jest.fn();
     render(<ModalSignature open={true} onConfirm={onConfirm} onCancel={onCancel} />);
     const dialog = screen.getByRole('dialog', { name: /Electronic Signature Required/i });
-    const cancelBtn = within(dialog).getByRole('button', { name: /Cancel signature/i });
+    const cancelBtn = within(dialog).getByTestId('cancel-signature');
     fireEvent.click(cancelBtn);
     expect(onCancel).toHaveBeenCalledTimes(1);
     expect(onConfirm).not.toHaveBeenCalled();
