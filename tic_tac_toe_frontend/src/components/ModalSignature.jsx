@@ -61,10 +61,15 @@ function ModalSignature({ open, onConfirm, onCancel }) {
       role="dialog"
       aria-modal="true"
       aria-labelledby="signature-title"
+      aria-describedby="signature-desc"
       ref={dialogRef}
+      data-testid="signature-modal"
     >
       <div className="modal">
         <h3 id="signature-title">Electronic Signature Required</h3>
+        <p id="signature-desc" className="sr-only">
+          Provide your electronic signature and a reason for the action, then press Confirm Signature to proceed or Cancel Signature to abort.
+        </p>
         <div className="form-group">
           <label htmlFor="signature-input">Signature</label>
           <input
@@ -75,6 +80,8 @@ function ModalSignature({ open, onConfirm, onCancel }) {
             onChange={(e) => setSignature(e.target.value)}
             aria-required="true"
             placeholder="Enter your signature"
+            name="signature"
+            autoComplete="current-password"
           />
         </div>
         <div className="form-group">
@@ -86,12 +93,32 @@ function ModalSignature({ open, onConfirm, onCancel }) {
             onChange={(e) => setReason(e.target.value)}
             aria-required="true"
             placeholder="Describe why this change is necessary"
+            name="reason"
+            autoComplete="off"
           />
         </div>
-        {error ? <div className="error-text" role="alert">{error}</div> : null}
+        {error ? (
+          <div className="error-text" role="alert" aria-live="assertive">
+            {error}
+          </div>
+        ) : null}
         <div className="modal-actions">
-          <button className="btn" onClick={handleConfirm} aria-label="Confirm signature">Confirm</button>
-          <button className="btn btn-secondary" onClick={onCancel} aria-label="Cancel signature">Cancel</button>
+          <button
+            className="btn"
+            onClick={handleConfirm}
+            aria-label="Confirm signature"
+            name="confirm-signature"
+          >
+            Confirm Signature
+          </button>
+          <button
+            className="btn btn-secondary"
+            onClick={onCancel}
+            aria-label="Cancel signature"
+            name="cancel-signature"
+          >
+            Cancel Signature
+          </button>
         </div>
       </div>
     </div>
