@@ -87,18 +87,19 @@ export function useTicTacToe() {
   const makeMove = useCallback((index) => {
     const before = { ...current, historyLength: history.length, step };
     try {
+      // Default role handling happens via currentUser?.role || 'player' in auditWrap
       if (!hasPermission(currentUser?.role, 'move')) {
         throw makeError('AUTHZ_ERROR', 'User lacks permission to move.');
       }
-      // Business rules and validation ordering:
-      // 1) Game already ended
-      validateGameNotEnded(winner, isDraw);
-      // 2) Occupied square (BUSINESS_RULE) should surface before raw index errors
-      validateSquareAvailable(current.squares, index);
-      // 3) Input index validation
-      validateMoveIndex(index);
 
-      // Alternation rule
+      // Validation order:
+      // 1) Post-game checks must surface BUSINESS_RULE first
+      validateGameNotEnded(winner, isDraw);
+      // 2) Occupied-square check should throw BUSINESS_RULE before index/range messages
+      validateSquareAvailable(current.squares, index);
+      // 3) Index validation as classic VALIDATION_ERROR
+      validateMoveIndex(index);
+      // 4) Alternation rule as BUSINESS_RULE
       validateAlternation(current.nextPlayer, current, step);
 
       const nextSquares = current.squares.slice();
@@ -113,7 +114,7 @@ export function useTicTacToe() {
       setStep(step + 1);
       auditWrap('UPDATE', 'Move', before, { ...next, historyLength: newHistory.length, step: step + 1 }, { reason: 'Make move' });
     } catch (err) {
-      // Normalize to our standardized error shape
+      // Normalize error shape: keep plain message in err.message; code in err.code
       let e;
       if (err && err.code) {
         e = err;
@@ -123,7 +124,6 @@ export function useTicTacToe() {
           ? makeError('VALIDATION_ERROR', msg)
           : makeError('BUSINESS_RULE', msg);
       }
-      // Ensure formatting is applied once at the audit boundary
       auditWrap('ERROR', 'Move', before, before, { error: formatError(e) });
       // eslint-disable-next-line no-console
       console.error(e);
