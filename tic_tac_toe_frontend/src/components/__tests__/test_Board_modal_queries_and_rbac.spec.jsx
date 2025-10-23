@@ -28,14 +28,16 @@ describe('Board modal queries and RBAC defaults', () => {
     expect(dialog).toBeInTheDocument();
 
     // Scoped queries within the dialog to prevent ambiguity
-    const sigInput = within(dialog).getByTestId('signature-input');
-    const reasonInput = within(dialog).getByTestId('reason-input');
-    const confirmBtn = within(dialog).getByTestId('confirm-signature');
+    const container = within(dialog).getByTestId('signature-modal-container');
+    const sigInput = within(container).getByTestId('signature-input');
+    const reasonInput = within(container).getByTestId('reason-input');
+    const confirmBtn = within(container).getByTestId('confirm-signature');
 
     // Attempt invalid submit to show validation error
     fireEvent.click(confirmBtn);
-    const alert = within(dialog).getByTestId('signature-error');
-    expect(alert).toHaveTextContent(/Signature required/i);
+    const alert = within(container).getByTestId('signature-error');
+    // Validator now returns min-length hint; assert against standardized plain message
+    expect(alert).toHaveTextContent(/Signature required \(min 2 chars\)\./i);
 
     // Fill in valid values and confirm
     fireEvent.change(sigInput, { target: { value: 'sig-ok' } });
