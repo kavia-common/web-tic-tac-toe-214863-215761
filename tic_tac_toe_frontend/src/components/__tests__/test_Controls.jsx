@@ -18,6 +18,7 @@ describe('Controls component', () => {
       permissions={{ canReset: false, canJump: false, canExport: true }}
     />);
 
+    // Use aria-labels defined in the component for precise querying
     const resetBtn = screen.getByRole('button', { name: /Reset game/i });
     const exportBtn = screen.getByRole('button', { name: /Export audit trail/i });
     const jumpBtns = screen.getAllByRole('button', { name: /Jump to move/i });
