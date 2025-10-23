@@ -81,19 +81,18 @@ export function normalizeError(input) {
   if (typeof input === 'string') {
     return { errorCode: 'UNKNOWN', errorMessage: stripExistingPrefix(input).trim() || 'Unknown error' };
   }
-  // Likely Error-like
+  // Error-like input
   const code = normalizeErrorCode(input?.code || '');
   const message =
     typeof input?.message === 'string'
       ? stripExistingPrefix(input.message).trim() || 'Unknown error'
       : 'Unknown error';
-  // Preserve UNKNOWN when nothing is identifiable
+
+  // Map unknown/missing codes to UNKNOWN instead of ERROR for consistency
   if (!['BUSINESS_RULE', 'VALIDATION_ERROR', 'AUTHZ_ERROR'].includes(code)) {
-    if (!input?.code) {
-      return { errorCode: 'ERROR', errorMessage: message };
-    }
+    return { errorCode: 'UNKNOWN', errorMessage: message };
   }
-  return { errorCode: code || 'ERROR', errorMessage: message };
+  return { errorCode: code, errorMessage: message };
 }
 
 /**
@@ -127,9 +126,7 @@ export function formatError(input) {
     case 'AUTHZ_ERROR':
       return `Authorization Error: ${msg}`;
     case 'UNKNOWN':
-      return `Unknown Error: ${msg}`;
     default:
-      // For ERROR or any other unmapped codes, treat as Unknown
       return `Unknown Error: ${msg}`;
   }
 }

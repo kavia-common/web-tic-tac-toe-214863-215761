@@ -42,6 +42,7 @@ function AuditTrailPanel({ events }) {
             {evt.error ? (
               <div className="audit-error" data-testid="audit-error-text">
                 <span data-testid="audit-error-fulltext">{evt.error}</span>
+                {/* Single-line mirror for per-line assertions; keep exactly one per error */}
                 <span data-testid="audit-error-line" style={{ display: 'none' }}>
                   {evt.error}
                 </span>
