@@ -90,13 +90,14 @@ export function useTicTacToe() {
       if (!hasPermission(currentUser?.role, 'move')) {
         throw makeError('AUTHZ_ERROR', 'User lacks permission to move.');
       }
-      // Ensure business-rule validations surface first for post-game or occupied square
-      // This guarantees BUSINESS_RULE classification before any index validation noise.
+      // Business rules first: post-game and occupied square before index validation
       validateGameNotEnded(winner, isDraw);
       validateSquareAvailable(current.squares, index);
-      // Only then validate index type/range (pure input validation)
+
+      // Input validation after biz-rule screening
       validateMoveIndex(index);
-      // Then alternation rule
+
+      // Alternation rule
       validateAlternation(current.nextPlayer, current, step);
 
       const nextSquares = current.squares.slice();
@@ -111,18 +112,17 @@ export function useTicTacToe() {
       setStep(step + 1);
       auditWrap('UPDATE', 'Move', before, { ...next, historyLength: newHistory.length, step: step + 1 }, { reason: 'Make move' });
     } catch (err) {
-      // Map unknown errors into expected categories with plain messages
+      // Normalize to our standardized error shape
       let e;
       if (err && err.code) {
         e = err;
       } else {
         const msg = String(err && err.message ? err.message : err);
-        if (/index|range|invalid|out of/i.test(msg)) {
-          e = makeError('VALIDATION_ERROR', msg);
-        } else {
-          e = makeError('BUSINESS_RULE', msg);
-        }
+        e = /index|range|invalid|out of/i.test(msg)
+          ? makeError('VALIDATION_ERROR', msg)
+          : makeError('BUSINESS_RULE', msg);
       }
+      // Ensure formatting is applied once at the audit boundary
       auditWrap('ERROR', 'Move', before, before, { error: formatError(e) });
       // eslint-disable-next-line no-console
       console.error(e);

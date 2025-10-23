@@ -36,6 +36,7 @@ describe('move validations', () => {
     try {
       validateSquareAvailable(squares, 0);
     } catch (e) {
+      // assert on code and plain message
       expect(e.code).toBe('BUSINESS_RULE');
       expect(e.message).toMatch(/already occupied/);
     }
