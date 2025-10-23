@@ -1,4 +1,5 @@
 import React from 'react';
+import React from 'react';
 import { render, screen, fireEvent, within, cleanup } from '@testing-library/react';
 import ModalSignature from '../ModalSignature';
 

@@ -72,6 +72,7 @@ export function validateAlternation(expectedPlayer, current, step) {
 export function validateGameNotEnded(winner, isDraw) {
   if (winner || isDraw) {
     // Attempting play after end is a business rule violation
+    // Must specifically message 'Game already ended.' for test expectations
     throw makeError('BUSINESS_RULE', 'Game already ended.');
   }
 }

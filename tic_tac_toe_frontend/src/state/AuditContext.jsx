@@ -46,7 +46,7 @@ export function AuditTrailProvider({ children }) {
     try {
       const raw = window.localStorage.getItem(USER_STORAGE_KEY);
       const parsed = raw ? JSON.parse(raw) : null;
-      // default role='player' for unauthorized scenarios if not present
+      // default provider/wrapper role is 'player' for unauthorized flows
       if (!parsed) return { id: 'user1', role: 'player' };
       return { id: parsed.id || 'user1', role: parsed.role || 'player' };
     } catch {
